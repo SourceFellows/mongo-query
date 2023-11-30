@@ -62,8 +62,12 @@ func (f Field) NotExists() Expression {
 	return Expression{field: f, value: QueryOperator{operator: "$exists", value: false}}
 }
 
-func (f Field) All(val ...any) Expression {
+func (f Field) ArrayContainsAll(val ...any) Expression {
 	return Expression{field: f, value: QueryOperator{operator: "$all", value: val}}
+}
+
+func (f Field) ArraySize(size int) Expression {
+	return Expression{field: f, value: QueryOperator{operator: "$size", value: size}}
 }
 
 func (e Expression) And(e2 ...Expression) Expression {

@@ -67,9 +67,14 @@ var testData = []struct {
 		0,
 	},
 	{
-		"all",
-		Listing.Amenities.All("Wifi", "Kitchen", "Iron"),
+		"array contains all",
+		Listing.Amenities.ArrayContainsAll("Wifi", "Kitchen", "Iron"),
 		3378,
+	},
+	{
+		"array size",
+		Listing.Amenities.ArraySize(5),
+		31,
 	}}
 
 func TestField_Equals(t *testing.T) {
