@@ -84,34 +84,3 @@ func Test_Compare_Gt(t *testing.T) {
 	}
 
 }
-
-func Test_Compare_Not(t *testing.T) {
-
-	//given
-	f1 := Not(Listing.ListingUrl.Equals("ABC"))
-	mongoFilter := f1.bsonD()
-	apiFilter := bson.D{
-		{"listing_url", bson.D{{"$not", bson.D{{"$eq", "ABC"}}}}},
-	}
-
-	//when
-	//check if api works
-	apiResult, err := query[ListingAndReview](apiFilter)
-	if err != nil {
-		t.Errorf("could not execute api query %v", err)
-	}
-	mongoResult, err := query[ListingAndReview](mongoFilter)
-	if err != nil {
-		t.Errorf("could not execute mongo query %v", err)
-	}
-
-	//then
-
-	if !reflect.DeepEqual(mongoFilter, apiFilter) {
-		t.Errorf("mongo and api generated value differs: %v %v", mongoFilter, apiFilter)
-	}
-	if !reflect.DeepEqual(mongoResult, apiResult) {
-		t.Errorf("api and generated results differs %v, %v", len(mongoResult), len(apiResult))
-	}
-
-}

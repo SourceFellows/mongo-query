@@ -54,11 +54,6 @@ var testData = []struct {
 		"not exists",
 		Listing.ListingUrl.NotExists(),
 		0,
-	},
-	{
-		"not",
-		Not(Listing.ListingUrl.Equals("asd")),
-		0,
 	}}
 
 func TestField_Equals(t *testing.T) {

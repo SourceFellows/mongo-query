@@ -12,10 +12,6 @@ type QueryOperator struct {
 	value    any
 }
 
-func Not(e1 Expression) Expression {
-	return Expression{field: e1.field, value: bson.D{{"$not", e1}}}
-}
-
 type LogicalOperator struct {
 	operator    string
 	expressions []Expression
