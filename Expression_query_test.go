@@ -31,6 +31,12 @@ var testData = []struct {
 		1,
 	},
 	{
+		"equalsOrEquals found",
+		Listing.ListingUrl.Equals("https://www.airbnb.com/rooms/10009999").
+			Or(Listing.ListingUrl.Equals("https://www.airbnb.com/rooms/10021707")),
+		2,
+	},
+	{
 		"in",
 		Listing.ListingUrl.In("https://www.airbnb.com/rooms/10009999"),
 		1,
@@ -39,6 +45,11 @@ var testData = []struct {
 		"in multiple",
 		Listing.ListingUrl.In("https://www.airbnb.com/rooms/10009999", "https://www.airbnb.com/rooms/10021707"),
 		2,
+	},
+	{
+		"not in",
+		Listing.ListingUrl.NotIn("https://www.airbnb.com/rooms/10009999"),
+		5554,
 	},
 	{
 		"gt",

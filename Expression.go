@@ -50,7 +50,7 @@ func (f Field) In(value ...any) Expression {
 	return Expression{field: f, value: QueryOperator{operator: "$in", value: value}}
 }
 
-func (f Field) Nin(value ...any) Expression {
+func (f Field) NotIn(value ...any) Expression {
 	return Expression{field: f, value: QueryOperator{operator: "$nin", value: value}}
 }
 
@@ -86,7 +86,7 @@ func (e Expression) bsonD() bson.D {
 	switch e.value.(type) {
 	case LogicalOperator:
 		qo := e.value.(LogicalOperator)
-		returnValue = bson.D{{qo.operator, extractList(qo.expressions)}}
+		returnValue = bson.D{{qo.operator, expressionsToBSON(qo.expressions)}}
 	case QueryOperator:
 		qo := e.value.(QueryOperator)
 		returnValue = bson.D{{string(e.field), bson.D{{qo.operator, qo.value}}}}
@@ -97,10 +97,10 @@ func (e Expression) bsonD() bson.D {
 	return returnValue
 }
 
-func extractList(expressions []Expression) []bson.D {
-	values := []primitive.E{}
+func expressionsToBSON(expressions []Expression) []bson.D {
+	values := []bson.D{}
 	for _, expression := range expressions {
-		values = append(values, bson.E{string(expression.field), expression.value})
+		values = append(values, bson.D{primitive.E{string(expression.field), expression.value}})
 	}
-	return []bson.D{values}
+	return values
 }
