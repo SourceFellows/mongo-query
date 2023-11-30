@@ -13,9 +13,12 @@ func Test_Compare_EqualsAndEquals(t *testing.T) {
 		And(Listing.Name.Equals("Horto flat with small garden"))
 	mongoFilter := f1.bsonD()
 	apiFilter := bson.D{{"$and", []bson.D{
-		bson.D{
+		{
 			{"listing_url", "https://www.airbnb.com/rooms/10009999"},
-			{"name", "Horto flat with small garden"}},
+		},
+		{
+			{"name", "Horto flat with small garden"},
+		},
 	}}}
 
 	//when

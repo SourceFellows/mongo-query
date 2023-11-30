@@ -65,6 +65,11 @@ var testData = []struct {
 		"not exists",
 		Listing.ListingUrl.NotExists(),
 		0,
+	},
+	{
+		"all",
+		Listing.Amenities.All("Wifi", "Kitchen", "Iron"),
+		3378,
 	}}
 
 func TestField_Equals(t *testing.T) {

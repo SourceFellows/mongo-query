@@ -62,6 +62,10 @@ func (f Field) NotExists() Expression {
 	return Expression{field: f, value: QueryOperator{operator: "$exists", value: false}}
 }
 
+func (f Field) All(val ...any) Expression {
+	return Expression{field: f, value: QueryOperator{operator: "$all", value: val}}
+}
+
 func (e Expression) And(e2 ...Expression) Expression {
 	all := []Expression{}
 	all = append(all, e)

@@ -6,12 +6,14 @@ type ListingFilter struct {
 	ListingUrl Field
 	Name       Field
 	Bedrooms   Field
+	Amenities  Field
 }
 
 var Listing = ListingFilter{
 	ListingUrl: Field("listing_url"),
 	Name:       Field("name"),
 	Bedrooms:   Field("bedrooms"),
+	Amenities:  Field("amenities"),
 }
 
 type ListingAndReview struct {
