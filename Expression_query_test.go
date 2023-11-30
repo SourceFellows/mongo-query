@@ -83,7 +83,9 @@ var testData = []struct {
 	},
 	{
 		"complex query",
-		Listing.Amenities.ArraySize(15).And(Listing.ListingUrl.Equals("https://www.airbnb.com/rooms/10009999")),
+		Listing.Amenities.ArraySize(15).
+			And(Listing.ListingUrl.Equals("https://www.airbnb.com/rooms/10009999"),
+				Listing.Images.PictureUrl.Equals("https://a0.muscache.com/im/pictures/5b408b9e-45da-4808-be65-4edc1f29c453.jpg?aki_policy=large")),
 		1,
 	}}
 
