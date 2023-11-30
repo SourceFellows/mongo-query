@@ -100,7 +100,7 @@ func (e Expression) bsonD() bson.D {
 func expressionsToBSON(expressions []Expression) []bson.D {
 	values := []bson.D{}
 	for _, expression := range expressions {
-		values = append(values, bson.D{primitive.E{string(expression.field), expression.value}})
+		values = append(values, bson.D{primitive.E{Key: string(expression.field), Value: expression.value}})
 	}
 	return values
 }
