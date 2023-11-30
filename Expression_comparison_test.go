@@ -87,3 +87,37 @@ func Test_Compare_Gt(t *testing.T) {
 	}
 
 }
+
+func Test_Compare_EqualsAndSize(t *testing.T) {
+
+	//given
+	f1 := Listing.ListingUrl.Equals("https://www.airbnb.com/rooms/10009999").And(Listing.Amenities.ArraySize(15))
+	mongoFilter := f1.bsonD()
+	apiFilter := bson.D{{"$and", []bson.D{
+		{
+			{"listing_url", "https://www.airbnb.com/rooms/10009999"},
+		},
+		{
+			{"amenities", bson.D{{"$size", 15}}},
+		},
+	}}}
+
+	//when
+	apiResult, err := query[ListingAndReview](apiFilter)
+	if err != nil {
+		t.Errorf("could not execute query %v", err)
+	}
+	mongoResult, err := query[ListingAndReview](mongoFilter)
+	if err != nil {
+		t.Errorf("could not execute query %v", err)
+	}
+
+	//then
+	if !reflect.DeepEqual(mongoResult, apiResult) {
+		t.Errorf("api and generated results differs %v, %v", len(mongoResult), len(apiResult))
+	}
+	if !reflect.DeepEqual(mongoFilter, apiFilter) {
+		t.Errorf("mongoquery and api value differs %v %v", mongoFilter, apiFilter)
+	}
+
+}

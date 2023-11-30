@@ -6,14 +6,28 @@ type ListingFilter struct {
 	ListingUrl Field
 	Name       Field
 	Bedrooms   Field
-	Amenities  Field
+	Amenities  ArrayField
+	Images     ImagesFilter
+}
+
+type ImagesFilter struct {
+	ThumbnailUrl Field
+	MediumUrl    Field
+	PictureUrl   Field
+	XlPictureUrl Field
 }
 
 var Listing = ListingFilter{
 	ListingUrl: Field("listing_url"),
 	Name:       Field("name"),
 	Bedrooms:   Field("bedrooms"),
-	Amenities:  Field("amenities"),
+	Amenities:  ArrayField("amenities"),
+	Images: ImagesFilter{
+		ThumbnailUrl: Field("images.thumbnail_url"),
+		MediumUrl:    Field("images.medium_url"),
+		PictureUrl:   Field("images.picture_url"),
+		XlPictureUrl: Field("images.xl_picture_url"),
+	},
 }
 
 type ListingAndReview struct {

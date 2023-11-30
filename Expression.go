@@ -1,11 +1,13 @@
 package filter
 
 import (
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Field string
+type ArrayField string
 
 type QueryOperator struct {
 	operator string
@@ -62,12 +64,12 @@ func (f Field) NotExists() Expression {
 	return Expression{field: f, value: QueryOperator{operator: "$exists", value: false}}
 }
 
-func (f Field) ArrayContainsAll(val ...any) Expression {
-	return Expression{field: f, value: QueryOperator{operator: "$all", value: val}}
+func (f ArrayField) ArrayContainsAll(val ...any) Expression {
+	return Expression{field: Field(f), value: QueryOperator{operator: "$all", value: val}}
 }
 
-func (f Field) ArraySize(size int) Expression {
-	return Expression{field: f, value: QueryOperator{operator: "$size", value: size}}
+func (f ArrayField) ArraySize(size int) Expression {
+	return Expression{field: Field(f), value: QueryOperator{operator: "$size", value: size}}
 }
 
 func (e Expression) And(e2 ...Expression) Expression {
@@ -85,7 +87,9 @@ func (e Expression) Or(e2 ...Expression) Expression {
 }
 
 func (e Expression) MarshalBSON() ([]byte, error) {
-	return bson.Marshal(e.bsonD())
+	data := e.bsonD()
+	fmt.Println(data)
+	return bson.Marshal(data)
 }
 
 func (e Expression) bsonD() bson.D {
@@ -108,7 +112,15 @@ func (e Expression) bsonD() bson.D {
 func expressionsToBSON(expressions []Expression) []bson.D {
 	values := []bson.D{}
 	for _, expression := range expressions {
-		values = append(values, bson.D{primitive.E{Key: string(expression.field), Value: expression.value}})
+		var d bson.D
+		switch expression.value.(type) {
+		case QueryOperator:
+			qo := expression.value.(QueryOperator)
+			d = bson.D{primitive.E{Key: string(expression.field), Value: bson.D{{Key: qo.operator, Value: qo.value}}}}
+		default:
+			d = bson.D{primitive.E{Key: string(expression.field), Value: expression.value}}
+		}
+		values = append(values, d)
 	}
 	return values
 }

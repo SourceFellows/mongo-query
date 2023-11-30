@@ -75,6 +75,16 @@ var testData = []struct {
 		"array size",
 		Listing.Amenities.ArraySize(5),
 		31,
+	},
+	{
+		"nested field",
+		Listing.Images.PictureUrl.Equals("https://a0.muscache.com/im/pictures/5b408b9e-45da-4808-be65-4edc1f29c453.jpg?aki_policy=large"),
+		1,
+	},
+	{
+		"complex query",
+		Listing.Amenities.ArraySize(15).And(Listing.ListingUrl.Equals("https://www.airbnb.com/rooms/10009999")),
+		1,
 	}}
 
 func TestField_Equals(t *testing.T) {
