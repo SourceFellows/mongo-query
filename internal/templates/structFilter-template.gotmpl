@@ -11,12 +11,28 @@ type {{$StructName}} struct {
 	{{range .Fields -}}
 		{{.Name}} mq.Field
 	{{end}}
+	{{range .NestedStructs -}}
+	    {{.Name}}Filter struct {
+	        {{range .Fields -}}
+        		{{.Name}} mq.Field
+        	{{end}}
+	    }
+	{{end}}
 }
 
-func {{.Name}}() {{$StructName}} {
-	return {{$StructName}}{
-		{{range .Fields -}}
-			{{.Name}}: mq.Field("{{.BsonTag}}"),
-		{{end}}
-	}
+var {{.Name}} = {{$StructName}} {
+    {{range .Fields -}}
+        {{.Name}}: mq.Field("{{.BsonTag}}"),
+    {{end}}
+    {{range .NestedStructs -}}
+        {{.Name}}Filter: struct {
+            {{range .Fields -}}
+                {{.Name}} mq.Field
+            {{end}}
+        }{
+            {{range .Fields -}}
+                {{.Name}} : mq.Field("{{.BsonTag}}"),
+            {{end}}
+        },
+    {{end}}
 }

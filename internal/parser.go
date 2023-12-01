@@ -10,8 +10,9 @@ import (
 
 type (
 	MongoDBStruct struct {
-		Name   string
-		Fields []*Field
+		Name          string
+		Fields        []*Field
+		NestedStructs []*MongoDBStruct
 	}
 
 	Field struct {
@@ -56,7 +57,7 @@ func ParseFile(filePath string, explicitStructs string) ([]*MongoDBStruct, error
 }
 
 func parseStruct(name string, structType *ast.StructType, scope *ast.Scope) *MongoDBStruct {
-	parsedFields := parseFields(structType.Fields.List, scope)
+	parsedFields, nestedStructs := parseFields(structType.Fields.List, scope)
 	fields := make([]*Field, 0)
 	for _, field := range parsedFields {
 		if field != nil {
@@ -65,13 +66,15 @@ func parseStruct(name string, structType *ast.StructType, scope *ast.Scope) *Mon
 	}
 
 	return &MongoDBStruct{
-		Name:   name,
-		Fields: fields,
+		Name:          name,
+		Fields:        fields,
+		NestedStructs: nestedStructs,
 	}
 }
 
-func parseFields(fields []*ast.Field, scope *ast.Scope) []*Field {
+func parseFields(fields []*ast.Field, scope *ast.Scope) ([]*Field, []*MongoDBStruct) {
 	parsedFields := make([]*Field, 0)
+	parsedNestedStructs := make([]*MongoDBStruct, 0)
 
 	for _, field := range fields {
 		f := &Field{
@@ -89,20 +92,15 @@ func parseFields(fields []*ast.Field, scope *ast.Scope) []*Field {
 			it := field.Type.(*ast.Ident)
 			if _, ok2 := scope.Objects[it.Name]; ok2 {
 				fmt.Println("found nested struct", it.Name)
-				nestedFields := parseFields(it.Obj.Decl.(*ast.TypeSpec).Type.(*ast.StructType).Fields.List, scope)
-				for _, nestedField := range nestedFields {
-					nestedField.Name = fmt.Sprintf("%s%s", it.Name, nestedField.Name)
-					nestedField.BsonTag = fmt.Sprintf("%s.%s", f.BsonTag, nestedField.BsonTag)
-				}
-
-				parsedFields = append(parsedFields, nestedFields...)
+				nestedFields, nestedStructs := parseFields(it.Obj.Decl.(*ast.TypeSpec).Type.(*ast.StructType).Fields.List, scope)
+				parsedNestedStructs = append(parsedNestedStructs, &MongoDBStruct{Name: f.Name, Fields: nestedFields, NestedStructs: nestedStructs})
 				continue
 			}
+			parsedFields = append(parsedFields, f)
 		case *ast.StructType:
 			fmt.Println("found nested inline struct", f.Name)
-			nestedFields := parseNestedFields(f, field.Type.(*ast.StructType).Fields.List, scope)
-			parsedFields = append(parsedFields, nestedFields...)
-			continue
+			nestedField, nestedStructs := parseFields(field.Type.(*ast.StructType).Fields.List, scope)
+			parsedNestedStructs = append(parsedNestedStructs, &MongoDBStruct{Name: f.Name, Fields: nestedField, NestedStructs: nestedStructs})
 		case *ast.ArrayType:
 			it := field.Type.(*ast.ArrayType)
 			fmt.Println("found array", f.Name)
@@ -123,26 +121,16 @@ func parseFields(fields []*ast.Field, scope *ast.Scope) []*Field {
 				nestedStructFields = obj.Decl.(*ast.TypeSpec).Type.(*ast.StructType).Fields.List
 			}
 
-			nestedFields := parseNestedFields(f, nestedStructFields, scope)
-			parsedFields = append(parsedFields, nestedFields...)
+			nestedField, nestedStructs := parseFields(nestedStructFields, scope)
+			parsedNestedStructs = append(parsedNestedStructs, &MongoDBStruct{Name: f.Name, Fields: nestedField, NestedStructs: nestedStructs})
 			continue
+		default:
+			parsedFields = append(parsedFields, f)
 		}
 
-		parsedFields = append(parsedFields, f)
 	}
 
-	return parsedFields
-}
-
-func parseNestedFields(parentField *Field, fields []*ast.Field, scope *ast.Scope) []*Field {
-	nestedFields := parseFields(fields, scope)
-	// fields of nested structs have to be prefixed to ensure unique names; for now with the parent field name
-	for _, nestedField := range nestedFields {
-		nestedField.Name = fmt.Sprintf("%s%s", parentField.Name, nestedField.Name)
-		nestedField.BsonTag = fmt.Sprintf("%s.%s", parentField.BsonTag, nestedField.BsonTag)
-	}
-
-	return nestedFields
+	return parsedFields, parsedNestedStructs
 }
 
 func parseFieldName(field *ast.Field) string {
