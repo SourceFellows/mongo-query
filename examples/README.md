@@ -3,6 +3,10 @@
 The examples use a sample database with data from AirBnb (see below). You can start the
 database with the [docker-compose](docker-compose.yml) file in this directory.
 
+## Folders
+
+- [generator](./generator) - Shows how to run the generator.
+
 ## Setup the start the database
 
 Run the following command in this directory to setup a sample database with 
