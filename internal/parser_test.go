@@ -1,16 +1,21 @@
 package internal
 
 import (
+	"bytes"
+	_ "embed"
 	"strings"
 	"testing"
 )
 
+//go:embed example-types_test.go
+var testFile []byte
+
 func TestParseFile(t *testing.T) {
 	//given
-	filePath := "examples/types.go"
+	r := bytes.NewReader(testFile)
 
 	//when
-	mongoDBStructs, err := ParseFile(filePath, "")
+	mongoDBStructs, err := ParseFile(r, "")
 
 	//then
 	if err != nil {
@@ -26,11 +31,11 @@ func TestParseFile(t *testing.T) {
 
 func TestParseFile_withExplicitStructs(t *testing.T) {
 	//given
-	filePath := "examples/types.go"
+	r := bytes.NewReader(testFile)
 	structs := "Basic,WithArray"
 
 	//when
-	mongoDBStructs, err := ParseFile(filePath, structs)
+	mongoDBStructs, err := ParseFile(r, structs)
 
 	//then
 	if err != nil {
@@ -40,6 +45,7 @@ func TestParseFile_withExplicitStructs(t *testing.T) {
 
 	if len(mongoDBStructs) != 2 {
 		t.Errorf("expected to have 2 struct but had %d", len(mongoDBStructs))
+		return
 	}
 
 	for _, dbStruct := range mongoDBStructs {

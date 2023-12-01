@@ -26,7 +26,7 @@ func main() {
 	if outDirectory == nil || *outDirectory == "" {
 		workingDir, err := os.Getwd()
 		if err != nil {
-			panic(err)
+			log.Fatalf("could not use output directory: %v", err)
 		}
 
 		outDirectory = &workingDir
@@ -37,13 +37,17 @@ func main() {
 	if os.IsNotExist(err) {
 		err = os.MkdirAll(outDir, 0774)
 		if err != nil {
-			panic(err)
+			log.Fatalf("could not create specified output directory: %v", err)
 		}
 	}
 
-	mongoDbStructs, err := internal.ParseFile(*inFile, *explicitStructs)
+	inputFile, err := os.Open(*inFile)
 	if err != nil {
-		panic(err)
+		log.Fatalf("could not open specified input file: %v", err)
+	}
+	mongoDbStructs, err := internal.ParseFile(inputFile, *explicitStructs)
+	if err != nil {
+		log.Fatalf("could not parse specified input file: %v", err)
 	}
 
 	writerType := internal.StructWriter

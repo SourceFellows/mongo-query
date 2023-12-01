@@ -4,6 +4,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"io"
 	"strings"
 )
 
@@ -22,9 +23,9 @@ type (
 	}
 )
 
-func ParseFile(filePath string, explicitStructs string) ([]*MongoDBStruct, error) {
+func ParseFile(input io.Reader, explicitStructs string) ([]*MongoDBStruct, error) {
 	fs := token.NewFileSet()
-	file, err := parser.ParseFile(fs, filePath, nil, 0)
+	file, err := parser.ParseFile(fs, "", input, 0)
 	if err != nil {
 		return nil, err
 	}
