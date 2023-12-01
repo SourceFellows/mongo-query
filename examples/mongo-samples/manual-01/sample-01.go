@@ -24,18 +24,18 @@ func main() {
 	}
 
 	log.Println("sample 01")
-	err = findwithFilter(ctx, collection, bson.D{{"size.uom", "in"}})
+	err = findWithFilter(ctx, collection, bson.D{{"size.uom", "in"}})
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Println("--")
-	err = findwithFilter(ctx, collection, InventoryFilter.Size.Uom.Equals("in"))
+	err = findWithFilter(ctx, collection, InventoryFilter.Size.Uom.Equals("in"))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	log.Println("sample 02")
-	err = findwithFilter(ctx, collection, bson.D{
+	err = findWithFilter(ctx, collection, bson.D{
 		{"size.h", bson.D{
 			{"$lt", 15},
 		}},
@@ -46,7 +46,7 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Println("--")
-	err = findwithFilter(ctx, collection,
+	err = findWithFilter(ctx, collection,
 		InventoryFilter.Size.H.Lt(15).
 			And(InventoryFilter.Size.Uom.Equals("in"),
 				InventoryFilter.Status.Equals("D")))
@@ -55,7 +55,7 @@ func main() {
 	}
 }
 
-func findwithFilter(ctx context.Context, collection *mongo.Collection, filter any) error {
+func findWithFilter(ctx context.Context, collection *mongo.Collection, filter any) error {
 
 	cursor, err := collection.Find(
 		ctx,
