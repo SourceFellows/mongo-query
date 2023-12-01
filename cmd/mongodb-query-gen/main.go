@@ -46,12 +46,10 @@ func main() {
 		panic(err)
 	}
 
-	createFilterFile(outDir)
-
 	writerType := internal.StructWriter
 	for _, mongoDbStruct := range mongoDbStructs {
 		//out := os.Stdout
-		outFile := fmt.Sprintf("%s/%sCriteria.go", outDir, strings.ToLower(mongoDbStruct.Name))
+		outFile := fmt.Sprintf("%s/%sFilter.go", outDir, strings.ToLower(mongoDbStruct.Name))
 		out, err := os.OpenFile(outFile, os.O_CREATE|os.O_RDWR, 0644)
 		if err != nil {
 			log.Fatal(err)
@@ -64,20 +62,4 @@ func main() {
 
 		out.Close()
 	}
-}
-
-func createFilterFile(outDir string) {
-	writerType := internal.StaticWriter
-	outFile := fmt.Sprintf("%s/mongoCriteria.go", outDir)
-	out, err := os.OpenFile(outFile, os.O_CREATE|os.O_RDWR, 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer out.Close()
-
-	err = internal.Write(nil, writerType, out)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
 }

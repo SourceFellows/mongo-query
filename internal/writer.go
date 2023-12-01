@@ -15,7 +15,6 @@ type WriterType struct {
 
 var (
 	StructWriter = WriterType{templates.StructFilterTemplate}
-	StaticWriter = WriterType{templates.MongoFilterTemplate}
 )
 
 func Write(dbStruct *MongoDBStruct, writerType WriterType, writer io.Writer) error {
