@@ -11,13 +11,15 @@ import (
 type (
 	MongoDBStruct struct {
 		Name          string
+		BsonTag       string
 		Fields        []*Field
 		NestedStructs []*MongoDBStruct
 	}
 
 	Field struct {
-		Name    string
-		BsonTag string
+		Name      string
+		BsonTag   string
+		ArrayType bool
 	}
 )
 
@@ -93,16 +95,27 @@ func parseFields(fields []*ast.Field, scope *ast.Scope) ([]*Field, []*MongoDBStr
 			if _, ok2 := scope.Objects[it.Name]; ok2 {
 				fmt.Println("found nested struct", it.Name)
 				nestedFields, nestedStructs := parseFields(it.Obj.Decl.(*ast.TypeSpec).Type.(*ast.StructType).Fields.List, scope)
-				parsedNestedStructs = append(parsedNestedStructs, &MongoDBStruct{Name: f.Name, Fields: nestedFields, NestedStructs: nestedStructs})
+				parsedNestedStructs = append(parsedNestedStructs, &MongoDBStruct{
+					Name:          f.Name,
+					BsonTag:       f.BsonTag,
+					Fields:        nestedFields,
+					NestedStructs: nestedStructs,
+				})
 				continue
 			}
 			parsedFields = append(parsedFields, f)
 		case *ast.StructType:
 			fmt.Println("found nested inline struct", f.Name)
 			nestedField, nestedStructs := parseFields(field.Type.(*ast.StructType).Fields.List, scope)
-			parsedNestedStructs = append(parsedNestedStructs, &MongoDBStruct{Name: f.Name, Fields: nestedField, NestedStructs: nestedStructs})
+			parsedNestedStructs = append(parsedNestedStructs, &MongoDBStruct{
+				Name:          f.Name,
+				BsonTag:       f.BsonTag,
+				Fields:        nestedField,
+				NestedStructs: nestedStructs,
+			})
 		case *ast.ArrayType:
 			it := field.Type.(*ast.ArrayType)
+			f.ArrayType = true
 			fmt.Println("found array", f.Name)
 			var nestedStructFields []*ast.Field
 			switch it.Elt.(type) {
@@ -122,7 +135,12 @@ func parseFields(fields []*ast.Field, scope *ast.Scope) ([]*Field, []*MongoDBStr
 			}
 
 			nestedField, nestedStructs := parseFields(nestedStructFields, scope)
-			parsedNestedStructs = append(parsedNestedStructs, &MongoDBStruct{Name: f.Name, Fields: nestedField, NestedStructs: nestedStructs})
+			parsedNestedStructs = append(parsedNestedStructs, &MongoDBStruct{
+				Name:          f.Name,
+				BsonTag:       f.BsonTag,
+				Fields:        nestedField,
+				NestedStructs: nestedStructs,
+			})
 			continue
 		default:
 			parsedFields = append(parsedFields, f)

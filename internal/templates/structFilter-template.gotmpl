@@ -8,31 +8,52 @@ import (
 )
 
 type {{$StructName}} struct {
-	{{range .Fields -}}
-		{{.Name}} mq.Field
-	{{end}}
+	{{- range .Fields -}}
+		{{- if not .ArrayType -}}
+		    {{.Name}} mq.Field
+		{{ else -}}
+		    {{.Name}} mq.ArrayField
+		{{ end }}
+	{{- end -}}
 	{{range .NestedStructs -}}
 	    {{.Name}}Filter struct {
-	        {{range .Fields -}}
-        		{{.Name}} mq.Field
-        	{{end}}
+	        {{- range .Fields -}}
+                {{- if not .ArrayType -}}
+                    {{.Name}} mq.Field
+                {{ else -}}
+                    {{.Name}} mq.ArrayField
+                {{- end -}}
+        	{{- end -}}
 	    }
 	{{end}}
 }
 
 var {{.Name}} = {{$StructName}} {
     {{range .Fields -}}
-        {{.Name}}: mq.Field("{{.BsonTag}}"),
-    {{end}}
-    {{range .NestedStructs -}}
+        {{ if not .ArrayType -}}
+            {{.Name}}: mq.Field("{{.BsonTag}}"),
+        {{ else -}}
+            {{.Name}}: mq.ArrayField("{{.BsonTag}}"),
+        {{ end }}
+    {{- end -}}
+    {{- range .NestedStructs -}}
+        {{ $outerName := .BsonTag }}
         {{.Name}}Filter: struct {
-            {{range .Fields -}}
-                {{.Name}} mq.Field
-            {{end}}
+            {{- range .Fields -}}
+                {{- if not .ArrayType -}}
+                    {{.Name}} mq.Field
+                {{ else -}}
+                    {{.Name}} mq.ArrayField
+                {{- end -}}
+            {{- end -}}
         }{
-            {{range .Fields -}}
-                {{.Name}} : mq.Field("{{.BsonTag}}"),
-            {{end}}
+            {{ range .Fields -}}
+                {{ if not .ArrayType -}}
+                    {{.Name}} : mq.Field("{{$outerName}}.{{.BsonTag}}"),
+                {{ else -}}
+                    {{.Name}} : mq.ArrayField("{{$outerName}}.{{.BsonTag}}"),
+                {{- end -}}
+            {{- end -}}
         },
     {{end}}
 }
