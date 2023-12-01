@@ -67,7 +67,7 @@ monGO-Query uses its own simple API with `Expression`s, `Field`s and `Operator`s
 
 You can simply define a filter type for each struct you want to query. Instances of this filter types can than be used as parameter to the MongoDB API. They will automatically be marshalled as MongoDB `bson.D` objects. 
 
-> You can generate this filter types with a generator which is **also part of this project**! [See below](#generating-filter-types).
+> **You can generate this filter types with a generator which is also part of this project**! [See below](#generating-filter-types).
 
 ```Golang
 type ListingFilter struct {
