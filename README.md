@@ -2,6 +2,10 @@
 
 ![monGO-Query](https://github.com/sourcefellows/mongo-query/actions/workflows/go.yml/badge.svg)
 
+<center><img src="https://www.source-fellows.com/mongo-query.png"></center>
+
+----
+
 **monGO-Query is a Library which makes building MongoDB Queries easy in Golang**
 
 Formulating requests with the MongoDB API is sometimes very difficult and error-prone. You have to build and nest untyped objects. This will quickly become confusing and therefore difficult to read and maintain. monGO-Query solves this problem with an easier to understand (DSL like) API.
