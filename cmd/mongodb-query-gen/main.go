@@ -62,4 +62,6 @@ func main() {
 
 		out.Close()
 	}
+
+	fmt.Println("generation of mongodb-queries finished.")
 }

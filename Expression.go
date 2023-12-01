@@ -6,19 +6,25 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// Field represents a single field in a BSON document.
 type Field string
+
+// ArrayField represents an array field in a BSON document.
 type ArrayField string
 
+// QueryOperator is used to represent a MongoDB Query Operator.
 type QueryOperator struct {
 	operator string
 	value    any
 }
 
+// LogicalOperator is used to represent a logical MongoDB Operator.
 type LogicalOperator struct {
 	operator    string
 	expressions []Expression
 }
 
+// Expression represents a MongoDB Expression for a specific field.
 type Expression struct {
 	field Field
 	value any
@@ -73,14 +79,14 @@ func (f ArrayField) ArraySize(size int) Expression {
 }
 
 func (e Expression) And(e2 ...Expression) Expression {
-	all := []Expression{}
+	var all []Expression
 	all = append(all, e)
 	all = append(all, e2...)
 	return Expression{value: LogicalOperator{operator: "$and", expressions: all}}
 }
 
 func (e Expression) Or(e2 ...Expression) Expression {
-	all := []Expression{}
+	var all []Expression
 	all = append(all, e)
 	all = append(all, e2...)
 	return Expression{value: LogicalOperator{operator: "$or", expressions: all}}

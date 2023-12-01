@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -93,7 +92,6 @@ func parseFields(fields []*ast.Field, scope *ast.Scope) ([]*Field, []*MongoDBStr
 		case *ast.Ident:
 			it := field.Type.(*ast.Ident)
 			if _, ok2 := scope.Objects[it.Name]; ok2 {
-				fmt.Println("found nested struct", it.Name)
 				nestedFields, nestedStructs := parseFields(it.Obj.Decl.(*ast.TypeSpec).Type.(*ast.StructType).Fields.List, scope)
 				parsedNestedStructs = append(parsedNestedStructs, &MongoDBStruct{
 					Name:          f.Name,
@@ -105,7 +103,6 @@ func parseFields(fields []*ast.Field, scope *ast.Scope) ([]*Field, []*MongoDBStr
 			}
 			parsedFields = append(parsedFields, f)
 		case *ast.StructType:
-			fmt.Println("found nested inline struct", f.Name)
 			nestedField, nestedStructs := parseFields(field.Type.(*ast.StructType).Fields.List, scope)
 			parsedNestedStructs = append(parsedNestedStructs, &MongoDBStruct{
 				Name:          f.Name,
@@ -116,7 +113,6 @@ func parseFields(fields []*ast.Field, scope *ast.Scope) ([]*Field, []*MongoDBStr
 		case *ast.ArrayType:
 			it := field.Type.(*ast.ArrayType)
 			f.ArrayType = true
-			fmt.Println("found array", f.Name)
 			var nestedStructFields []*ast.Field
 			switch it.Elt.(type) {
 			case *ast.StructType:
