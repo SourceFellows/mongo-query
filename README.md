@@ -113,6 +113,19 @@ cursor, err := collection.Find(ctx, filter)
 ...
 ```
 
+or with embedded documents...
+
+```Golang
+...
+filter := Listing.Amenities.ArraySize(15).
+    And(Listing.ListingUrl.Equals("<value>"),
+        Listing.Images.PictureUrl.Equals("<value>"))
+
+collection := client.Database("airbnb").Collection("listingsAndReviews")
+cursor, err := collection.Find(ctx, filter)
+...
+```
+
 > You will find a complete sample within the [unit tests](./Expression_query_test.go) of this project.
 
 ## Generating filter types

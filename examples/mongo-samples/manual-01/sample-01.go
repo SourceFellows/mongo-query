@@ -142,17 +142,6 @@ func initDB(coll *mongo.Collection) error {
 
 }
 
-type Inventory struct {
-	Item string `bson:"item"`
-	Qty  int    `bson:"qty"`
-	Size struct {
-		H   int    `bson:"h"`
-		W   int    `bson:"w"`
-		Uom string `bson:"uom"`
-	} `bson:"size"`
-	Status string `bson:"status"`
-}
-
 var InventoryFilter = struct {
 	Item mq.Field
 	Qty  mq.Field
