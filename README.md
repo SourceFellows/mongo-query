@@ -124,3 +124,14 @@ go install github.com/sourcefellows/mongo-query/cmd/mongo-query-gen@latest
 
 mongo-query-gen -in Types.go -outDir .
 ```
+
+## Samples from MongoDB manual
+
+* Query nested equals ([see here](https://www.mongodb.com/docs/manual/tutorial/query-embedded-documents/) or [local impl](./examples/mongo-samples/manual-01))
+
+```Golang
+//MongoDB API
+err = findwithFilter(ctx, collection, bson.D{{"size.uom", "in"}})
+//monGO-Query
+err = findwithFilter(ctx, collection, InventoryFilter.Size.Uom.Equals("in"))
+```

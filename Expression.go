@@ -1,7 +1,6 @@
 package filter
 
 import (
-	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -140,7 +139,6 @@ func (e Expression) Or(e2 ...Expression) Expression {
 // MarshalBSON serializes the Expression to BSON data.
 func (e Expression) MarshalBSON() ([]byte, error) {
 	data := e.bsonD()
-	fmt.Println(data)
 	return bson.Marshal(data)
 }
 
