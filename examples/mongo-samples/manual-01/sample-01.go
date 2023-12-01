@@ -23,12 +23,33 @@ func main() {
 		log.Fatal(err)
 	}
 
+	log.Println("sample 01")
 	err = findwithFilter(ctx, collection, bson.D{{"size.uom", "in"}})
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Println("--")
 	err = findwithFilter(ctx, collection, InventoryFilter.Size.Uom.Equals("in"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("sample 02")
+	err = findwithFilter(ctx, collection, bson.D{
+		{"size.h", bson.D{
+			{"$lt", 15},
+		}},
+		{"size.uom", "in"},
+		{"status", "D"},
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("--")
+	err = findwithFilter(ctx, collection,
+		InventoryFilter.Size.H.Lt(15).
+			And(InventoryFilter.Size.Uom.Equals("in"),
+				InventoryFilter.Status.Equals("D")))
 	if err != nil {
 		log.Fatal(err)
 	}

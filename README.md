@@ -142,11 +142,29 @@ mongo-query-gen -in Types.go -outDir .
 
 ## Samples from MongoDB manual
 
-* Query embedded documents ([see here](https://www.mongodb.com/docs/manual/tutorial/query-embedded-documents/) or [local impl](./examples/mongo-samples/manual-01))
+* Query embedded documents (Specify Equality Match on a Nested Field) ([see here](https://www.mongodb.com/docs/manual/tutorial/query-embedded-documents/) or [local impl](./examples/mongo-samples/manual-01))
 
 ```Golang
 //MongoDB API
 err = findwithFilter(ctx, collection, bson.D{{"size.uom", "in"}})
 //monGO-Query
 err = findwithFilter(ctx, collection, InventoryFilter.Size.Uom.Equals("in"))
+```
+
+* Query embedded documents (Specify AND Condition) ([see here](https://www.mongodb.com/docs/manual/tutorial/query-embedded-documents/) or [local impl](./examples/mongo-samples/manual-01))
+
+```Golang
+//MongoDB API
+err = findwithFilter(ctx, collection, bson.D{
+    {"size.h", bson.D{
+        {"$lt", 15},
+    }},
+    {"size.uom", "in"},
+    {"status", "D"},
+})
+//monGO-Query
+err = findwithFilter(ctx, collection,
+    InventoryFilter.Size.H.Lt(15).
+        And(InventoryFilter.Size.Uom.Equals("in"),
+            InventoryFilter.Status.Equals("D")))
 ```
