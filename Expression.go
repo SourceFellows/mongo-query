@@ -99,10 +99,14 @@ func (f Field) NotIn(value ...any) Expression {
 	return Expression{field: f, value: QueryOperator{operator: "$nin", value: value}}
 }
 
+// Exists represents a element query operation to check if a field exists. It Matches
+// documents that have the specified field.
 func (f Field) Exists() Expression {
 	return Expression{field: f, value: QueryOperator{operator: "$exists", value: true}}
 }
 
+// NotExists represents a element query operation to check if a field does not exist.
+// It Matches documents that do not have the specified field.
 func (f Field) NotExists() Expression {
 	return Expression{field: f, value: QueryOperator{operator: "$exists", value: false}}
 }
@@ -115,6 +119,8 @@ func (f ArrayField) ArraySize(size int) Expression {
 	return Expression{field: Field(f), value: QueryOperator{operator: "$size", value: size}}
 }
 
+// And represents a logical query operation for 'and' condition. It takes one or more
+// Expression(s) and selects the documents that satisfy all the expressions.
 func (e Expression) And(e2 ...Expression) Expression {
 	var all []Expression
 	all = append(all, e)
@@ -122,6 +128,8 @@ func (e Expression) And(e2 ...Expression) Expression {
 	return Expression{value: LogicalOperator{operator: "$and", expressions: all}}
 }
 
+// Or represents a logical query operation for 'or' condition. It takes one or more
+// Expression(s) and selects the documents that satisfy at least one expression.
 func (e Expression) Or(e2 ...Expression) Expression {
 	var all []Expression
 	all = append(all, e)
@@ -129,6 +137,7 @@ func (e Expression) Or(e2 ...Expression) Expression {
 	return Expression{value: LogicalOperator{operator: "$or", expressions: all}}
 }
 
+// MarshalBSON serializes the Expression to BSON data.
 func (e Expression) MarshalBSON() ([]byte, error) {
 	data := e.bsonD()
 	fmt.Println(data)
