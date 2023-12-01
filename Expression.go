@@ -30,34 +30,71 @@ type Expression struct {
 	value any
 }
 
+// Equals represents a query operation for 'equals' comparison.
 func (f Field) Equals(value any) Expression {
 	return Expression{field: f, value: value}
 }
 
+// Gt represents a query operation for 'greater than' comparison.
 func (f Field) Gt(value any) Expression {
 	return Expression{field: f, value: QueryOperator{operator: "$gt", value: value}}
 }
 
+// GreaterThan represents a query operation for 'greater than' comparison.
+func (f Field) GreaterThan(value any) Expression {
+	return f.Gt(value)
+}
+
+// Lt represents a query operation for 'less than' comparison.
 func (f Field) Lt(value any) Expression {
 	return Expression{field: f, value: QueryOperator{operator: "$lt", value: value}}
 }
 
+// LessThan represents a query operation for 'less than' comparison.
+func (f Field) LessThan(value any) Expression {
+	return f.Lt(value)
+}
+
+// Lte represents a query operation for 'less than or equal' comparison.
 func (f Field) Lte(value any) Expression {
 	return Expression{field: f, value: QueryOperator{operator: "$lte", value: value}}
 }
 
+// LessThanOrEqual represents a query operation for 'less than or equals' comparison.
+func (f Field) LessThanOrEqual(value any) Expression {
+	return f.Lte(value)
+}
+
+// Ne represents a query operation for 'not equals' comparison.
 func (f Field) Ne(value any) Expression {
 	return Expression{field: f, value: QueryOperator{operator: "$ne", value: value}}
 }
 
+// NotEquals represents a query operation for 'not equals' comparison.
+func (f Field) NotEquals(value any) Expression {
+	return f.Ne(value)
+}
+
+// Gte represents a query operation for 'greater than or equals' comparison.
 func (f Field) Gte(value any) Expression {
 	return Expression{field: f, value: QueryOperator{operator: "$gte", value: value}}
 }
 
+// GreaterThanOrEquals represents a query operation for 'greater than or equals' comparison.
+func (f Field) GreaterThanOrEquals(value any) Expression {
+	return f.Gte(value)
+}
+
+// In represents a query operation for 'in' comparison. The operator selects
+// the documents where the value of a field equals any value in the specified parameter(s).
 func (f Field) In(value ...any) Expression {
 	return Expression{field: f, value: QueryOperator{operator: "$in", value: value}}
 }
 
+// NotIn represents a query operation for 'not in' comparison. The operator selects
+// the documents where:
+//   - the specified field value is not in the specified array or
+//   - the specified field does not exist.
 func (f Field) NotIn(value ...any) Expression {
 	return Expression{field: f, value: QueryOperator{operator: "$nin", value: value}}
 }
