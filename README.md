@@ -51,7 +51,7 @@ In this example you have to:
 * know the BSON struct tags for all your fields (`"listing_url"`, `"name"`)
 * cross your fingers that no one will change the BSON mapping
 
-In contrast, the *same* query with **monGO-query** looks like this:
+In contrast, the *same* query with **mongo Query** looks like this:
 
 ```Golang
 filter := Listing.ListingUrl.Equals("https://www.airbnb.com/rooms/10009999").
