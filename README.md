@@ -1,18 +1,18 @@
-# monGO Query
+# mongo Query
 
-![monGO-Query](https://github.com/sourcefellows/mongo-query/actions/workflows/go.yml/badge.svg)
+![mongo Query](https://github.com/sourcefellows/mongo-query/actions/workflows/go.yml/badge.svg)
 
-<center><img src="https://www.source-fellows.com/mongo-query.png"></center>
+<center><img alt="mongo Query" src="./assets/mongo-query-logo-black.png"></center>
 
 ----
 
-**monGO-Query is a Library which makes building MongoDB Queries easy in Golang**
+**mongo Query is a Library which makes building MongoDB Queries easy in Golang**
 
-Formulating requests with the MongoDB API is sometimes very difficult and error-prone. You have to build and nest untyped objects. This will quickly become confusing and therefore difficult to read and maintain. monGO-Query solves this problem with an easier to understand (DSL like) API.
+Formulating requests with the MongoDB API is sometimes very difficult and error-prone. You have to build and nest untyped objects. This will quickly become confusing and therefore difficult to read and maintain. mongo Query solves this problem with an easier to understand (DSL like) API.
 
-## MongoDB API vs monGO-Query
+## MongoDB API vs mongo Query
 
-The following example shows how the queries differ between the MongoDB API and monGO-Query. First of all, the struct with which the data is mapped in the MongoDB database:
+The following example shows how the queries differ between the MongoDB API and mongo Query. First of all, the struct with which the data is mapped in the MongoDB database:
 
 ```Golang
 type ListingAndReview struct {
@@ -65,9 +65,9 @@ It is:
 * easy to write
 * independent of the `bson.D` structure
 
-## How to use monGO-Query
+## How to use mongo Query
 
-monGO-Query uses its own simple API with `Expression`s, `Field`s and `Operator`s.
+mongo Query uses its own simple API with `Expression`s, `Field`s and `Operator`s.
 
 You can simply define a filter type for each struct you want to query. Instances of this filter types can than be used as parameter to the MongoDB API. They will automatically be marshalled as MongoDB `bson.D` objects. 
 
@@ -160,7 +160,7 @@ mongo-query-gen -in Types.go -outDir .
 ```Golang
 //MongoDB API
 err = findWithFilter(ctx, collection, bson.D{{"size.uom", "in"}})
-//monGO-Query
+//mongo Query
 err = findWithFilter(ctx, collection, InventoryFilter.Size.Uom.Equals("in"))
 ```
 
@@ -175,7 +175,7 @@ err = findWithFilter(ctx, collection, bson.D{
     {"size.uom", "in"},
     {"status", "D"},
 })
-//monGO-Query
+//mongo Query
 err = findWithFilter(ctx, collection,
     InventoryFilter.Size.H.Lt(15).
         And(InventoryFilter.Size.Uom.Equals("in"),
