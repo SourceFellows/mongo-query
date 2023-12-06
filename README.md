@@ -2,7 +2,7 @@
 
 ![mongo Query](https://github.com/sourcefellows/mongo-query/actions/workflows/go.yml/badge.svg)
 
-<center><img alt="mongo Query" src="./assets/mongo-query-logo-black.png"></center>
+<center><img width="100%" alt="mongo Query" src="./assets/mongo-query-logo-black.png"></center>
 
 ----
 
