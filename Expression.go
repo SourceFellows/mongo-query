@@ -194,8 +194,13 @@ func (f ArrayField) ArrayContainsExact(val ...any) Expression {
 	return Expression{field: Field(f), value: val}
 }
 
-func (f ArrayField) ArrayContains(queries ...QueryOperator) Expression {
+func (f ArrayField) ArrayContainsElement(queries ...QueryOperator) Expression {
 	return Expression{field: Field(f), value: queries}
+}
+
+// ArrayContainsElementMatchesExpression matches all documents which meet the EXACT expression.
+func (f ArrayField) ArrayContainsElementMatchesExpression(expressions ...Expression) Expression {
+	return Expression{field: Field(f), value: expressions}
 }
 
 func (f ArrayField) ArraySize(size int) Expression {

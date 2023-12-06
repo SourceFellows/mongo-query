@@ -87,12 +87,12 @@ var testData = []struct {
 	},
 	{
 		"array contains with query operator",
-		Listing.Amenities.ArrayContains(Equals("Wifi")),
+		Listing.Amenities.ArrayContainsElement(Equals("Wifi")),
 		5303,
 	},
 	{
 		"array contains with query operator and 'and condition'",
-		Listing.Bedrooms.Gt(8).And(Listing.Amenities.ArrayContains(Equals("Wifi"))),
+		Listing.Bedrooms.Gt(8).And(Listing.Amenities.ArrayContainsElement(Equals("Wifi"))),
 		6,
 	},
 	{

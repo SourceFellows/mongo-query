@@ -125,7 +125,7 @@ func Test_Compare_EqualsAndSize(t *testing.T) {
 func Test_Compare_ArrayContainsQueryOperator(t *testing.T) {
 
 	//given
-	f1 := Listing.Amenities.ArrayContains(Equals("Wifi"))
+	f1 := Listing.Amenities.ArrayContainsElement(Equals("Wifi"))
 	mongoFilter := f1.bsonD()
 	apiFilter := bson.D{{"amenities", bson.D{
 		{"$eq", "Wifi"},
@@ -154,7 +154,7 @@ func Test_Compare_ArrayContainsQueryOperator(t *testing.T) {
 func Test_Compare_ArrayContainsQueryOperatorWithAndCondition(t *testing.T) {
 
 	//given
-	f1 := Listing.Bedrooms.Gt(8).And(Listing.Amenities.ArrayContains(Equals("Wifi")))
+	f1 := Listing.Bedrooms.Gt(8).And(Listing.Amenities.ArrayContainsElement(Equals("Wifi")))
 	mongoFilter := f1.bsonD()
 	apiFilter := bson.D{{Key: "$and", Value: []bson.D{
 		{{Key: "bedrooms", Value: bson.D{{"$gt", 8}}}},
