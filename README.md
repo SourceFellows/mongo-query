@@ -10,6 +10,16 @@
 
 Formulating requests with the MongoDB API is sometimes very difficult and error-prone. You have to build and nest untyped objects. This will quickly become confusing and therefore difficult to read and maintain. mongo Query solves this problem with an easier to understand (DSL like) API.
 
+The following expression will find all documents where the array of 'amenities' has a size of 15 and the 'ListingUrl' equals '<value>' and the 'pictureUrl' of the 'image' equals '<value>':
+
+```Golang
+Listing.Amenities.ArraySize(15).
+  And(Listing.ListingUrl.Equals("<value>"),
+      Listing.Images.PictureUrl.Equals("<value>"))
+```
+
+The queries are build with Filter structs which can be generated with a commandline tool which is also part of this project (see [Generating filter types](#generating-filter-types)).
+
 ## MongoDB API vs mongo Query
 
 The following example shows how the queries differ between the MongoDB API and mongo Query. First of all, the struct with which the data is mapped in the MongoDB database:
