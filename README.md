@@ -20,6 +20,8 @@ Listing.Amenities.ArraySize(15).
 
 The queries are build with Filter structs which can be generated with a commandline tool which is also part of this project (see [Generating filter types](#generating-filter-types)).
 
+The [API documentation can be found here](https://pkg.go.dev/github.com/sourcefellows/mongo-query#section-documentation)
+
 ## MongoDB API vs mongo Query
 
 The following example shows how the queries differ between the MongoDB API and mongo Query. First of all, the struct with which the data is mapped in the MongoDB database:

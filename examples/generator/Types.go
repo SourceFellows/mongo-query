@@ -2,6 +2,8 @@ package generator
 
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
+//go:generate mongo-query-gen -in Types.go -outDir .
+
 type ListingAndReview struct {
 	Id                   string               `bson:"_id"`
 	ListingUrl           string               `bson:"listing_url"`
