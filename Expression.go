@@ -17,6 +17,80 @@ type QueryOperator struct {
 	value    any
 }
 
+func (qo QueryOperator) bson() bson.D {
+	return bson.D{{qo.operator, qo.value}}
+}
+
+// Equals builds a simple QueryOperator for MongoDB operator "$eq".
+func Equals(value any) QueryOperator {
+	return QueryOperator{operator: "$eq", value: value}
+}
+
+// Gt builds a simple QueryOperator for MongoDB operator "$gt".
+func Gt(value any) QueryOperator {
+	return QueryOperator{operator: "$gt", value: value}
+}
+
+// Lt builds a simple QueryOperator for MongoDB operator "$lt".
+// "Less than"
+func Lt(value any) QueryOperator {
+	return QueryOperator{operator: "$lt", value: value}
+}
+
+// Lte builds a simple QueryOperator for MongoDB operator "$lte".
+// "Less than or equals"
+func Lte(value any) QueryOperator {
+	return QueryOperator{operator: "$lte", value: value}
+}
+
+// Ne builds a simple QueryOperator for MongoDB operator "$ne".
+// "not equals"
+func Ne(value any) QueryOperator {
+	return QueryOperator{operator: "$ne", value: value}
+}
+
+// Gte builds a simple QueryOperator for MongoDB operator "$gte".
+// "greater or equals"
+func Gte(value any) QueryOperator {
+	return QueryOperator{operator: "$gte", value: value}
+}
+
+// In builds a simple QueryOperator for MongoDB operator "$in".
+// "in"
+func In(value ...any) QueryOperator {
+	return QueryOperator{operator: "$in", value: value}
+}
+
+// NotIn builds a simple QueryOperator for MongoDB operator "$nin".
+// "in"
+func NotIn(value ...any) QueryOperator {
+	return QueryOperator{operator: "$nin", value: value}
+}
+
+// Exists builds a simple QueryOperator for MongoDB operator "$exists".
+// "exists"
+func Exists() QueryOperator {
+	return QueryOperator{operator: "$exists", value: true}
+}
+
+// NotExists builds a simple QueryOperator for MongoDB operator "$exists".
+// "not exists"
+func NotExists() QueryOperator {
+	return QueryOperator{operator: "$exists", value: false}
+}
+
+// All builds a simple QueryOperator for MongoDB operator "$all".
+// "all"
+func All(val ...any) QueryOperator {
+	return QueryOperator{operator: "$all", value: val}
+}
+
+// Size builds a simple QueryOperator for MongoDB operator "$size".
+// "size of array"
+func Size(size int) QueryOperator {
+	return QueryOperator{operator: "$size", value: size}
+}
+
 // LogicalOperator is used to represent a logical MongoDB Operator.
 type LogicalOperator struct {
 	operator    string
@@ -36,7 +110,7 @@ func (f Field) Equals(value any) Expression {
 
 // Gt represents a query operation for 'greater than' comparison.
 func (f Field) Gt(value any) Expression {
-	return Expression{field: f, value: QueryOperator{operator: "$gt", value: value}}
+	return Expression{field: f, value: Gt(value)}
 }
 
 // GreaterThan represents a query operation for 'greater than' comparison.
@@ -46,7 +120,7 @@ func (f Field) GreaterThan(value any) Expression {
 
 // Lt represents a query operation for 'less than' comparison.
 func (f Field) Lt(value any) Expression {
-	return Expression{field: f, value: QueryOperator{operator: "$lt", value: value}}
+	return Expression{field: f, value: Lt(value)}
 }
 
 // LessThan represents a query operation for 'less than' comparison.
@@ -56,7 +130,7 @@ func (f Field) LessThan(value any) Expression {
 
 // Lte represents a query operation for 'less than or equal' comparison.
 func (f Field) Lte(value any) Expression {
-	return Expression{field: f, value: QueryOperator{operator: "$lte", value: value}}
+	return Expression{field: f, value: Lte(value)}
 }
 
 // LessThanOrEqual represents a query operation for 'less than or equals' comparison.
@@ -66,7 +140,7 @@ func (f Field) LessThanOrEqual(value any) Expression {
 
 // Ne represents a query operation for 'not equals' comparison.
 func (f Field) Ne(value any) Expression {
-	return Expression{field: f, value: QueryOperator{operator: "$ne", value: value}}
+	return Expression{field: f, value: Ne(value)}
 }
 
 // NotEquals represents a query operation for 'not equals' comparison.
@@ -76,7 +150,7 @@ func (f Field) NotEquals(value any) Expression {
 
 // Gte represents a query operation for 'greater than or equals' comparison.
 func (f Field) Gte(value any) Expression {
-	return Expression{field: f, value: QueryOperator{operator: "$gte", value: value}}
+	return Expression{field: f, value: Gte(value)}
 }
 
 // GreaterThanOrEquals represents a query operation for 'greater than or equals' comparison.
@@ -87,7 +161,7 @@ func (f Field) GreaterThanOrEquals(value any) Expression {
 // In represents a query operation for 'in' comparison. The operator selects
 // the documents where the value of a field equals any value in the specified parameter(s).
 func (f Field) In(value ...any) Expression {
-	return Expression{field: f, value: QueryOperator{operator: "$in", value: value}}
+	return Expression{field: f, value: In(value...)}
 }
 
 // NotIn represents a query operation for 'not in' comparison. The operator selects
@@ -95,27 +169,37 @@ func (f Field) In(value ...any) Expression {
 //   - the specified field value is not in the specified array or
 //   - the specified field does not exist.
 func (f Field) NotIn(value ...any) Expression {
-	return Expression{field: f, value: QueryOperator{operator: "$nin", value: value}}
+	return Expression{field: f, value: NotIn(value...)}
 }
 
 // Exists represents a element query operation to check if a field exists. It Matches
 // documents that have the specified field.
 func (f Field) Exists() Expression {
-	return Expression{field: f, value: QueryOperator{operator: "$exists", value: true}}
+	return Expression{field: f, value: Exists()}
 }
 
 // NotExists represents a element query operation to check if a field does not exist.
 // It Matches documents that do not have the specified field.
 func (f Field) NotExists() Expression {
-	return Expression{field: f, value: QueryOperator{operator: "$exists", value: false}}
+	return Expression{field: f, value: NotExists()}
 }
 
+// ArrayContainsAll matches all documents where the given values are in the array.
 func (f ArrayField) ArrayContainsAll(val ...any) Expression {
-	return Expression{field: Field(f), value: QueryOperator{operator: "$all", value: val}}
+	return Expression{field: Field(f), value: All(val...)}
+}
+
+// ArrayContainsExact matches all documents where ONLY the given values are in the array.
+func (f ArrayField) ArrayContainsExact(val ...any) Expression {
+	return Expression{field: Field(f), value: val}
+}
+
+func (f ArrayField) ArrayContains(queries ...QueryOperator) Expression {
+	return Expression{field: Field(f), value: queries}
 }
 
 func (f ArrayField) ArraySize(size int) Expression {
-	return Expression{field: Field(f), value: QueryOperator{operator: "$size", value: size}}
+	return Expression{field: Field(f), value: Size(size)}
 }
 
 // And represents a logical query operation for 'and' condition. It takes one or more
@@ -149,14 +233,25 @@ func (e Expression) bsonD() bson.D {
 	case LogicalOperator:
 		qo := e.value.(LogicalOperator)
 		returnValue = bson.D{{qo.operator, expressionsToBSON(qo.expressions)}}
+	case []QueryOperator:
+		qos := e.value.([]QueryOperator)
+		returnValue = bson.D{{string(e.field), queryOperatorsToBSON(qos)}}
 	case QueryOperator:
 		qo := e.value.(QueryOperator)
-		returnValue = bson.D{{string(e.field), bson.D{{qo.operator, qo.value}}}}
+		returnValue = bson.D{{string(e.field), qo.bson()}}
 	default:
 		returnValue = bson.D{{string(e.field), e.value}}
 	}
 
 	return returnValue
+}
+
+func queryOperatorsToBSON(operators []QueryOperator) bson.D {
+	value := bson.D{}
+	for _, operator := range operators {
+		value = append(value, bson.E{operator.operator, operator.value})
+	}
+	return value
 }
 
 func expressionsToBSON(expressions []Expression) []bson.D {
@@ -167,6 +262,9 @@ func expressionsToBSON(expressions []Expression) []bson.D {
 		case QueryOperator:
 			qo := expression.value.(QueryOperator)
 			d = bson.D{primitive.E{Key: string(expression.field), Value: bson.D{{Key: qo.operator, Value: qo.value}}}}
+		case []QueryOperator:
+			qo := expression.value.([]QueryOperator)
+			d = bson.D{primitive.E{Key: string(expression.field), Value: queryOperatorsToBSON(qo)}}
 		default:
 			d = bson.D{primitive.E{Key: string(expression.field), Value: expression.value}}
 		}

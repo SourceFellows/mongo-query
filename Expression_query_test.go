@@ -72,6 +72,30 @@ var testData = []struct {
 		3378,
 	},
 	{
+		"array contains exact",
+		Listing.Amenities.ArrayContainsExact("Internet",
+			"Wifi",
+			"Air conditioning",
+			"Kitchen",
+			"Buzzer/wireless intercom",
+			"Heating",
+			"Smoke detector",
+			"Carbon monoxide detector",
+			"Essentials",
+			"Lock on bedroom door"),
+		1,
+	},
+	{
+		"array contains with query operator",
+		Listing.Amenities.ArrayContains(Equals("Wifi")),
+		5303,
+	},
+	{
+		"array contains with query operator and 'and condition'",
+		Listing.Bedrooms.Gt(8).And(Listing.Amenities.ArrayContains(Equals("Wifi"))),
+		6,
+	},
+	{
 		"array size",
 		Listing.Amenities.ArraySize(5),
 		31,
@@ -106,7 +130,8 @@ func TestField_Equals(t *testing.T) {
 			}
 
 			if len(ts) != datum.expectedResultCount {
-				t.Errorf("expected %d but got: %d", datum.expectedResultCount, len(ts))
+				bsonElement := f1.bsonD()
+				t.Errorf("expected %d but got: %d. expression used: %v | bson: %v", datum.expectedResultCount, len(ts), f1.bsonD(), bsonElement)
 			}
 
 		})

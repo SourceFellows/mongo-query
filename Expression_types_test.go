@@ -8,6 +8,16 @@ type ListingFilter struct {
 	Bedrooms   Field
 	Amenities  ArrayField
 	Images     ImagesFilter
+	Reviews    ArrayField
+}
+
+type ReviewFilter struct {
+	Id           Field
+	Date         Field
+	ListingId    Field
+	ReviewerId   Field
+	ReviewerName Field
+	Comments     Field
 }
 
 type ImagesFilter struct {
@@ -28,6 +38,16 @@ var Listing = ListingFilter{
 		PictureUrl:   Field("images.picture_url"),
 		XlPictureUrl: Field("images.xl_picture_url"),
 	},
+	Reviews: ArrayField("reviews"),
+}
+
+var Review = ReviewFilter{
+	Id:           Field("_id"),
+	Date:         Field("date"),
+	ListingId:    Field("listing_id"),
+	ReviewerId:   Field("reviewer_id"),
+	ReviewerName: Field("reviewer_name"),
+	Comments:     Field("comments"),
 }
 
 type ListingAndReview struct {

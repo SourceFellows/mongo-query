@@ -52,7 +52,7 @@ func Test_Compare_In(t *testing.T) {
 
 	//then
 	if !reflect.DeepEqual(mongoResult, apiResult) {
-		t.Errorf("api and generated results differs %v, %v", len(mongoResult), len(apiResult))
+		t.Errorf("api and generated results differs lib: %v, api: %v", len(mongoResult), len(apiResult))
 	}
 
 }
@@ -83,7 +83,7 @@ func Test_Compare_Gt(t *testing.T) {
 		t.Errorf("api and generated value differs: %v %v", mongoFilter, apiFilter)
 	}
 	if !reflect.DeepEqual(mongoResult, apiResult) {
-		t.Errorf("api and generated results differs %v, %v", len(mongoResult), len(apiResult))
+		t.Errorf("api and generated results differs lib: %v, api: %v", len(mongoResult), len(apiResult))
 	}
 
 }
@@ -114,10 +114,69 @@ func Test_Compare_EqualsAndSize(t *testing.T) {
 
 	//then
 	if !reflect.DeepEqual(mongoResult, apiResult) {
-		t.Errorf("api and generated results differs %v, %v", len(mongoResult), len(apiResult))
+		t.Errorf("api and generated results differs lib: %v, api: %v", len(mongoResult), len(apiResult))
 	}
 	if !reflect.DeepEqual(mongoFilter, apiFilter) {
-		t.Errorf("mongoquery and api value differs %v %v", mongoFilter, apiFilter)
+		t.Errorf("mongoquery and api value differs lib: %v, api: %v", mongoFilter, apiFilter)
+	}
+
+}
+
+func Test_Compare_ArrayContainsQueryOperator(t *testing.T) {
+
+	//given
+	f1 := Listing.Amenities.ArrayContains(Equals("Wifi"))
+	mongoFilter := f1.bsonD()
+	apiFilter := bson.D{{"amenities", bson.D{
+		{"$eq", "Wifi"},
+	}}}
+
+	//when
+	apiResult, err := query[ListingAndReview](apiFilter)
+	if err != nil {
+		t.Errorf("could not execute query %v", err)
+	}
+	mongoResult, err := query[ListingAndReview](mongoFilter)
+	if err != nil {
+		t.Errorf("could not execute query %v", err)
+	}
+
+	//then
+	if !reflect.DeepEqual(mongoResult, apiResult) {
+		t.Errorf("api and generated results differs lib: %v, api: %v", len(mongoResult), len(apiResult))
+	}
+	if !reflect.DeepEqual(mongoFilter, apiFilter) {
+		t.Errorf("mongoquery and api value differs lib: %v, api: %v", mongoFilter, apiFilter)
+	}
+
+}
+
+func Test_Compare_ArrayContainsQueryOperatorWithAndCondition(t *testing.T) {
+
+	//given
+	f1 := Listing.Bedrooms.Gt(8).And(Listing.Amenities.ArrayContains(Equals("Wifi")))
+	mongoFilter := f1.bsonD()
+	apiFilter := bson.D{{Key: "$and", Value: []bson.D{
+		{{Key: "bedrooms", Value: bson.D{{"$gt", 8}}}},
+		{{Key: "amenities", Value: bson.D{{"$eq", "Wifi"}}}},
+	}}}
+
+	//when
+	apiResult, err := query[ListingAndReview](apiFilter)
+	if err != nil {
+		t.Errorf("could not execute query %v", err)
+	}
+	mongoResult, err := query[ListingAndReview](mongoFilter)
+	if err != nil {
+		t.Errorf("could not execute query %v", err)
+	}
+
+	//then
+	if !reflect.DeepEqual(mongoResult, apiResult) {
+		t.Errorf("api and generated results differs lib: %v, api: %v", len(mongoResult), len(apiResult))
+	}
+	if !reflect.DeepEqual(mongoFilter, apiFilter) {
+		t.Errorf("mongoquery and api value differs lib: %v, api: %v", mongoFilter, apiFilter)
 	}
 
 }
