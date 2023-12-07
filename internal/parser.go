@@ -19,12 +19,27 @@ type (
 
 	Field struct {
 		Name       string
+		FQBsonTag  string
 		BsonTag    string
 		ArrayType  bool
 		TypeName   string
 		StructType *MongoDBStruct
 	}
 )
+
+func (mds MongoDBStruct) HasStructsInArray() bool {
+	for _, field := range mds.Fields {
+		if field.ArrayType && field.StructType != nil {
+			return true
+		}
+	}
+	for _, nestedStruct := range mds.NestedStructs {
+		if nestedStruct.HasStructsInArray() {
+			return true
+		}
+	}
+	return false
+}
 
 func ParseFile(input io.Reader, explicitStructs string) ([]*MongoDBStruct, error) {
 	fs := token.NewFileSet()
@@ -93,7 +108,9 @@ func parseFields(parentStruct *MongoDBStruct, fields []*ast.Field, scope *ast.Sc
 			bsonNamePrefix = parentStruct.BsonTag + "."
 		}
 
-		f.BsonTag = bsonNamePrefix + parseFieldName(field)
+		f.BsonTag = parseFieldName(field)
+		f.FQBsonTag = bsonNamePrefix + f.BsonTag
+
 		if se, ok := field.Type.(*ast.StarExpr); ok {
 			// overwrite type in case of pointer
 			field.Type = se.X
@@ -106,7 +123,7 @@ func parseFields(parentStruct *MongoDBStruct, fields []*ast.Field, scope *ast.Sc
 
 				newStruct := &MongoDBStruct{
 					Name:    f.Name,
-					BsonTag: f.BsonTag,
+					BsonTag: f.FQBsonTag,
 				}
 
 				nestedFields, nestedStructs := parseFields(newStruct, it.Obj.Decl.(*ast.TypeSpec).Type.(*ast.StructType).Fields.List, scope)
@@ -119,7 +136,7 @@ func parseFields(parentStruct *MongoDBStruct, fields []*ast.Field, scope *ast.Sc
 		case *ast.StructType:
 			newStruct := &MongoDBStruct{
 				Name:    f.Name,
-				BsonTag: f.BsonTag,
+				BsonTag: f.FQBsonTag,
 			}
 			nestedFields, nestedStructs := parseFields(newStruct, field.Type.(*ast.StructType).Fields.List, scope)
 			newStruct.Fields = nestedFields
@@ -134,7 +151,7 @@ func parseFields(parentStruct *MongoDBStruct, fields []*ast.Field, scope *ast.Sc
 			case *ast.StructType:
 				newStruct := &MongoDBStruct{
 					Name:    f.Name,
-					BsonTag: f.BsonTag,
+					BsonTag: f.FQBsonTag,
 				}
 
 				nestedStructFields := it.Elt.(*ast.StructType).Fields.List
@@ -166,7 +183,7 @@ func parseFields(parentStruct *MongoDBStruct, fields []*ast.Field, scope *ast.Sc
 				nestedField, nestedStructs := parseFields(nestedStructFields, scope)
 					parsedNestedStructs = append(parsedNestedStructs, &MongoDBStruct{
 						Name:          f.Name,
-						BsonTag:       f.BsonTag,
+						FQBsonTag:       f.FQBsonTag,
 						Fields:        nestedField,
 						Fields:        nestedField,
 						NestedStructs: nestedStructs,
