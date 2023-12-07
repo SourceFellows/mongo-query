@@ -5,6 +5,7 @@ package filter
 
 import (
 	mq "github.com/sourcefellows/mongo-query"
+	"strconv"
 )
 
 type ListingAndReviewFilter struct {
@@ -271,8 +272,5 @@ func (r ReviewsFilter) ElementNo(i int) ReviewsFilter {
 		ReviewerId:   mq.Field(prefix + "reviewer_id"),
 		ReviewerName: mq.Field(prefix + "reviewer_name"),
 		Comments:     mq.Field(prefix + "comments"),
-	}
-}
-ts"),
 	}
 }
