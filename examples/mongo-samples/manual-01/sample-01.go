@@ -26,11 +26,12 @@ package main
 
 import (
 	"context"
+	"log"
+
 	mq "github.com/sourcefellows/mongo-query"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
 )
 
 func main() {
@@ -42,10 +43,10 @@ func main() {
 	defer client.Disconnect(ctx)
 
 	collection := client.Database("manual").Collection("manual-01")
-	err = initDB(collection)
-	if err != nil {
-		log.Fatal(err)
-	}
+	//err = initDB(collection)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 
 	log.Println("sample 01")
 	err = findWithFilter(ctx, collection, bson.D{{"size.uom", "in"}})
@@ -77,10 +78,40 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	err = updateWithFilter(ctx, collection,
+		InventoryFilter.Size.H.Lt(15).
+			And(InventoryFilter.Size.Uom.Equals("in")),
+		InventoryFilter.Qty.Set(8).Set(InventoryFilter.Status.Set("F")),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("after update")
+	err = findWithFilter(ctx, collection,
+		InventoryFilter.Size.H.Lt(15).
+			And(InventoryFilter.Size.Uom.Equals("in")))
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func updateWithFilter(ctx context.Context, collection *mongo.Collection, filter any, update any) error {
+	result, err := collection.UpdateOne(
+		ctx,
+		filter,
+		update,
+	)
+	if err != nil {
+		return err
+	}
+
+	log.Println(result)
+	return nil
 }
 
 func findWithFilter(ctx context.Context, collection *mongo.Collection, filter any) error {
-
 	cursor, err := collection.Find(
 		ctx,
 		filter,
