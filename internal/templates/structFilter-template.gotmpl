@@ -5,6 +5,7 @@ package filter
 
 import (
 	mq "github.com/sourcefellows/mongo-query"
+	{{if .HasStructsInArray }} "strconv" {{end}}
 )
 
 {{define "field"}}
@@ -30,9 +31,9 @@ import (
 {{define "instanceFields"}}
     {{range .Fields -}}
         {{ if not .ArrayType -}}
-            {{.Name}}: mq.Field("{{.BsonTag}}"),
+            {{.Name}}: mq.Field("{{.FQBsonTag}}"),
         {{ else -}}
-            {{.Name}}: mq.ArrayField("{{.BsonTag}}"),
+            {{.Name}}: mq.ArrayField("{{.FQBsonTag}}"),
         {{ end }}
     {{- end -}}
     {{- range .NestedStructs -}}
@@ -51,3 +52,24 @@ import (
 
 type {{.Name}}Filter {{ template "structDefinition" .}}
 var {{.Name}} = {{- template "structInstance" .}}
+
+ {{range .Fields -}}
+    {{ if and .ArrayType .StructType -}}
+        // {{.Name}}Filter defines a type for an embedded array type
+        type {{.Name}}Filter {{ template "structDefinition" .StructType}}
+        var {{.Name}} = {{- template "structInstance" .StructType}}
+
+        func (r {{.Name}}Filter) ElementNo(i int) {{.Name}}Filter {
+        	prefix := "{{.FQBsonTag}}." + strconv.Itoa(i)
+        	return {{.Name}}Filter{
+        		{{range .StructType.Fields -}}
+                        {{ if not .ArrayType -}}
+                            {{.Name}}: mq.Field(prefix + "{{.BsonTag}}"),
+                        {{ else -}}
+                            {{.Name}}: mq.ArrayField("{{.FQBsonTag}}"),
+                        {{ end }}
+                    {{- end -}}
+        	}
+        }
+    {{ end }}
+ {{- end -}}

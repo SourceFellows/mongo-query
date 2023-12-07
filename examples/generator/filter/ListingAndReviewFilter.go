@@ -241,3 +241,38 @@ var ListingAndReview = ListingAndReviewFilter{
 		ReviewScoresRating:        mq.Field("review_scores.review_scores_rating"),
 	},
 }
+
+// ReviewsFilter defines a type for an embedded array type
+type ReviewsFilter struct {
+	Id           mq.Field
+	Date         mq.Field
+	ListingId    mq.Field
+	ReviewerId   mq.Field
+	ReviewerName mq.Field
+	Comments     mq.Field
+}
+
+var Reviews = ReviewsFilter{
+
+	Id:           mq.Field("reviews._id"),
+	Date:         mq.Field("reviews.date"),
+	ListingId:    mq.Field("reviews.listing_id"),
+	ReviewerId:   mq.Field("reviews.reviewer_id"),
+	ReviewerName: mq.Field("reviews.reviewer_name"),
+	Comments:     mq.Field("reviews.comments"),
+}
+
+func (r ReviewsFilter) ElementNo(i int) ReviewsFilter {
+	prefix := "reviews." + strconv.Itoa(i)
+	return ReviewsFilter{
+		Id:           mq.Field(prefix + "_id"),
+		Date:         mq.Field(prefix + "date"),
+		ListingId:    mq.Field(prefix + "listing_id"),
+		ReviewerId:   mq.Field(prefix + "reviewer_id"),
+		ReviewerName: mq.Field(prefix + "reviewer_name"),
+		Comments:     mq.Field(prefix + "comments"),
+	}
+}
+ts"),
+	}
+}
