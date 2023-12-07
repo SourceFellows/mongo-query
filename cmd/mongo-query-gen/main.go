@@ -6,7 +6,6 @@ import (
 	"github.com/sourcefellows/mongo-query/internal"
 	"log"
 	"os"
-	"strings"
 )
 
 func main() {
@@ -53,7 +52,7 @@ func main() {
 	writerType := internal.StructWriter
 	for _, mongoDbStruct := range mongoDbStructs {
 		//out := os.Stdout
-		outFile := fmt.Sprintf("%s/%sFilter.go", outDir, strings.ToLower(mongoDbStruct.Name))
+		outFile := fmt.Sprintf("%s/%sFilter.go", outDir, mongoDbStruct.Name)
 		out, err := os.OpenFile(outFile, os.O_CREATE|os.O_RDWR, 0644)
 		if err != nil {
 			log.Fatal(err)
