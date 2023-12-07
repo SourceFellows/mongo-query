@@ -112,6 +112,16 @@ var testData = []struct {
 				Listing.Bedrooms.Lt(2),
 				Listing.Images.PictureUrl.Equals("https://a0.muscache.com/im/pictures/5b408b9e-45da-4808-be65-4edc1f29c453.jpg?aki_policy=large")),
 		1,
+	},
+	{
+		"Specify a Query Condition on a Field Embedded in an Array of Documents",
+		Review.ReviewerName.Equals("Milo"),
+		2,
+	},
+	{
+		"Specify a Query Condition on a Field Embedded in an Array of Documents",
+		Review.ElementNo(50).ReviewerName.Equals("Milo"),
+		1,
 	}}
 
 func TestField_Equals(t *testing.T) {
