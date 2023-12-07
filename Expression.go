@@ -1,6 +1,7 @@
 package filter
 
 import (
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -223,6 +224,48 @@ func (e Expression) Or(e2 ...Expression) Expression {
 	all = append(all, e)
 	all = append(all, e2...)
 	return Expression{value: LogicalOperator{operator: "$or", expressions: all}}
+}
+
+func (e Expression) String() string {
+
+	data := e.bsonD()
+	bytes, _ := bson.Marshal(data)
+	mapdata := make(map[string]any)
+	_ = bson.Unmarshal(bytes, &mapdata)
+
+	return mapToString(mapdata)
+}
+
+func mapToString(mapdata map[string]any) string {
+	returnVal := "bson.D{"
+	for k, v := range mapdata {
+		switch v.(type) {
+		case map[string]any:
+			returnVal += fmt.Sprintf("{\"%s\", %v}", k, mapToString(v.(map[string]any)))
+		case primitive.A:
+			value := v.(primitive.A)
+			returnVal += fmt.Sprintf("{\"%s\", ", k)
+			separator := ""
+			returnVal += "[]bson.D{"
+			for _, v = range value {
+				returnVal += separator
+				separator = ", "
+				if v1, ok := v.(map[string]any); ok {
+					returnVal += fmt.Sprintf("%s", mapToString(v1))
+				} else {
+					returnVal += fmt.Sprintf("{\"%s\", %v}", k, v)
+				}
+			}
+			returnVal += "}}"
+		case int, int32, int64, float32, float64:
+			returnVal += fmt.Sprintf("{\"%s\", %v}", k, v)
+		default:
+			returnVal += fmt.Sprintf("{\"%s\", \"%v\"}", k, v)
+		}
+	}
+	returnVal += "}"
+
+	return returnVal
 }
 
 // MarshalBSON serializes the Expression to BSON data.
