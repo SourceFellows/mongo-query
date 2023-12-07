@@ -19,7 +19,7 @@ func (fuo fullUpdateOperator) bson() bson.D {
 type UpdateOperator struct {
 	operator string
 	values   map[string]any
-	field    string
+	field    Field
 	value    any
 }
 
@@ -32,35 +32,83 @@ func (uo UpdateOperator) bson() bson.D {
 }
 
 func (uo UpdateOperator) bsonWithoutOperator() bson.E {
-	return bson.E{uo.field, uo.value}
+	return bson.E{string(uo.field), uo.value}
 }
 
-func Set(field string, value any) UpdateOperator {
+func set(field Field, value any) UpdateOperator {
 	return UpdateOperator{operator: "$set", field: field, value: value}
 }
 
-func CurrentDate(field string) UpdateOperator {
-	return UpdateOperator{operator: "$currentDate", field: field, value: true}
+func inc(field Field, value any) UpdateOperator {
+	return UpdateOperator{operator: "$inc", field: field, value: value}
 }
+
+func min(field Field, value any) UpdateOperator {
+	return UpdateOperator{operator: "$min", field: field, value: value}
+}
+
+func max(field Field, value any) UpdateOperator {
+	return UpdateOperator{operator: "$max", field: field, value: value}
+}
+
+func mul(field Field, value any) UpdateOperator {
+	return UpdateOperator{operator: "$mul", field: field, value: value}
+}
+
+func rename(field Field, value string) UpdateOperator {
+	return UpdateOperator{operator: "$rename", field: field, value: value}
+}
+
+func unset(field Field) UpdateOperator {
+	return UpdateOperator{operator: "$unset", field: field, value: ""}
+}
+
+//func currentDate(field Field) UpdateOperator {
+//	return UpdateOperator{operator: "$currentDate", field: "lastModified", value: true}
+//}
 
 type UpdateExpression struct {
 	value any
 }
 
 func (f Field) Set(value any) UpdateExpression {
-	return UpdateExpression{value: Set(string(f), value)}
+	return UpdateExpression{value: set(f, value)}
 }
 
-func (f Field) CurrentDate() UpdateExpression {
-	return UpdateExpression{value: CurrentDate(string(f))}
+func (f Field) Inc(value any) UpdateExpression {
+	return UpdateExpression{value: inc(f, value)}
 }
+
+func (f Field) Min(value any) UpdateExpression {
+	return UpdateExpression{value: min(f, value)}
+}
+
+func (f Field) Max(value any) UpdateExpression {
+	return UpdateExpression{value: max(f, value)}
+}
+
+func (f Field) Mul(value any) UpdateExpression {
+	return UpdateExpression{value: mul(f, value)}
+}
+
+func (f Field) Rename(value string) UpdateExpression {
+	return UpdateExpression{value: rename(f, value)}
+}
+
+func (f Field) Unset() UpdateExpression {
+	return UpdateExpression{value: unset(f)}
+}
+
+//func (f Field) CurrentDate() UpdateExpression {
+//	return UpdateExpression{value: currentDate(f)}
+//}
 
 func (ue UpdateExpression) MarshalBSON() ([]byte, error) {
 	data := ue.bsonD()
 	return bson.Marshal(data)
 }
 
-func (ue UpdateExpression) Set(ue2 ...UpdateExpression) UpdateExpression {
+func (ue UpdateExpression) And(ue2 ...UpdateExpression) UpdateExpression {
 	var all []any
 	all = append(all, ue.value)
 	for _, upex := range ue2 {
