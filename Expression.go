@@ -172,13 +172,13 @@ func (f Field) NotIn(value ...any) Expression {
 	return Expression{field: f, value: NotIn(value...)}
 }
 
-// Exists represents a element query operation to check if a field exists. It Matches
+// Exists represents an element query operation to check if a field exists. It Matches
 // documents that have the specified field.
 func (f Field) Exists() Expression {
 	return Expression{field: f, value: Exists()}
 }
 
-// NotExists represents a element query operation to check if a field does not exist.
+// NotExists represents an element query operation to check if a field does not exist.
 // It Matches documents that do not have the specified field.
 func (f Field) NotExists() Expression {
 	return Expression{field: f, value: NotExists()}
