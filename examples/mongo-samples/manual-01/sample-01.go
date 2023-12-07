@@ -82,7 +82,13 @@ func main() {
 	err = updateWithFilter(ctx, collection,
 		InventoryFilter.Size.H.Lt(15).
 			And(InventoryFilter.Size.Uom.Equals("in")),
-		InventoryFilter.Qty.Set(8).Set(InventoryFilter.Status.Set("F")),
+		InventoryFilter.Qty.
+			Min(4).
+			And(
+				InventoryFilter.Status.Max("F"),
+				InventoryFilter.Item.Set("papersRock"),
+				InventoryFilter.Size.W.Inc(10),
+			),
 	)
 	if err != nil {
 		log.Fatal(err)
