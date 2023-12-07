@@ -4,6 +4,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"go/types"
 	"io"
 	"strings"
 )
@@ -17,9 +18,11 @@ type (
 	}
 
 	Field struct {
-		Name      string
-		BsonTag   string
-		ArrayType bool
+		Name       string
+		BsonTag    string
+		ArrayType  bool
+		TypeName   string
+		StructType *MongoDBStruct
 	}
 )
 
@@ -59,7 +62,7 @@ func ParseFile(input io.Reader, explicitStructs string) ([]*MongoDBStruct, error
 }
 
 func parseStruct(name string, structType *ast.StructType, scope *ast.Scope) *MongoDBStruct {
-	parsedFields, nestedStructs := parseFields(structType.Fields.List, scope)
+	parsedFields, nestedStructs := parseFields(nil, structType.Fields.List, scope)
 	fields := make([]*Field, 0)
 	for _, field := range parsedFields {
 		if field != nil {
@@ -74,7 +77,7 @@ func parseStruct(name string, structType *ast.StructType, scope *ast.Scope) *Mon
 	}
 }
 
-func parseFields(fields []*ast.Field, scope *ast.Scope) ([]*Field, []*MongoDBStruct) {
+func parseFields(parentStruct *MongoDBStruct, fields []*ast.Field, scope *ast.Scope) ([]*Field, []*MongoDBStruct) {
 	parsedFields := make([]*Field, 0)
 	parsedNestedStructs := make([]*MongoDBStruct, 0)
 
@@ -83,7 +86,14 @@ func parseFields(fields []*ast.Field, scope *ast.Scope) ([]*Field, []*MongoDBStr
 			Name: field.Names[0].Name,
 		}
 
-		f.BsonTag = parseFieldName(field)
+		f.TypeName = types.ExprString(field.Type)
+
+		bsonNamePrefix := ""
+		if parentStruct != nil {
+			bsonNamePrefix = parentStruct.BsonTag + "."
+		}
+
+		f.BsonTag = bsonNamePrefix + parseFieldName(field)
 		if se, ok := field.Type.(*ast.StarExpr); ok {
 			// overwrite type in case of pointer
 			field.Type = se.X
@@ -93,51 +103,75 @@ func parseFields(fields []*ast.Field, scope *ast.Scope) ([]*Field, []*MongoDBStr
 		case *ast.Ident:
 			it := field.Type.(*ast.Ident)
 			if _, ok2 := scope.Objects[it.Name]; ok2 {
-				nestedFields, nestedStructs := parseFields(it.Obj.Decl.(*ast.TypeSpec).Type.(*ast.StructType).Fields.List, scope)
-				parsedNestedStructs = append(parsedNestedStructs, &MongoDBStruct{
-					Name:          f.Name,
-					BsonTag:       f.BsonTag,
-					Fields:        nestedFields,
-					NestedStructs: nestedStructs,
-				})
+
+				newStruct := &MongoDBStruct{
+					Name:    f.Name,
+					BsonTag: f.BsonTag,
+				}
+
+				nestedFields, nestedStructs := parseFields(newStruct, it.Obj.Decl.(*ast.TypeSpec).Type.(*ast.StructType).Fields.List, scope)
+				newStruct.Fields = nestedFields
+				newStruct.NestedStructs = nestedStructs
+				parsedNestedStructs = append(parsedNestedStructs, newStruct)
 				continue
 			}
 			parsedFields = append(parsedFields, f)
 		case *ast.StructType:
-			nestedField, nestedStructs := parseFields(field.Type.(*ast.StructType).Fields.List, scope)
-			parsedNestedStructs = append(parsedNestedStructs, &MongoDBStruct{
-				Name:          f.Name,
-				BsonTag:       f.BsonTag,
-				Fields:        nestedField,
-				NestedStructs: nestedStructs,
-			})
+			newStruct := &MongoDBStruct{
+				Name:    f.Name,
+				BsonTag: f.BsonTag,
+			}
+			nestedFields, nestedStructs := parseFields(newStruct, field.Type.(*ast.StructType).Fields.List, scope)
+			newStruct.Fields = nestedFields
+			newStruct.NestedStructs = nestedStructs
+			parsedNestedStructs = append(parsedNestedStructs, newStruct)
 		case *ast.ArrayType:
 			it := field.Type.(*ast.ArrayType)
 			f.ArrayType = true
-			var nestedStructFields []*ast.Field
+			parsedFields = append(parsedFields, f)
+
 			switch it.Elt.(type) {
 			case *ast.StructType:
-				// inline struct definition
-				nestedStructFields = it.Elt.(*ast.StructType).Fields.List
-			case *ast.Ident:
-				obj := it.Elt.(*ast.Ident).Obj
-				// explicit struct definition
-				if obj == nil {
-					// add simple field in case of primitive array type
-					parsedFields = append(parsedFields, f)
-					continue
+				newStruct := &MongoDBStruct{
+					Name:    f.Name,
+					BsonTag: f.BsonTag,
 				}
 
-				nestedStructFields = obj.Decl.(*ast.TypeSpec).Type.(*ast.StructType).Fields.List
+				nestedStructFields := it.Elt.(*ast.StructType).Fields.List
+				nestedFields, nestedStructs := parseFields(newStruct, nestedStructFields, scope)
+				newStruct.Fields = nestedFields
+				newStruct.NestedStructs = nestedStructs
+
+				f.StructType = newStruct
 			}
 
-			nestedField, nestedStructs := parseFields(nestedStructFields, scope)
-			parsedNestedStructs = append(parsedNestedStructs, &MongoDBStruct{
-				Name:          f.Name,
-				BsonTag:       f.BsonTag,
-				Fields:        nestedField,
-				NestedStructs: nestedStructs,
-			})
+			/*
+				var nestedStructFields []*ast.Field
+				switch it.Elt.(type) {
+				case *ast.StructType:
+					// inline struct definition
+					nestedStructFields = it.Elt.(*ast.StructType).Fields.List
+				case *ast.Ident:
+					obj := it.Elt.(*ast.Ident).Obj
+					// explicit struct definition
+					if obj == nil {
+						// add simple field in case of primitive array type
+						parsedFields = append(parsedFields, f)
+						continue
+					}
+
+					nestedStructFields = obj.Decl.(*ast.TypeSpec).Type.(*ast.StructType).Fields.List
+				}
+
+				nestedField, nestedStructs := parseFields(nestedStructFields, scope)
+					parsedNestedStructs = append(parsedNestedStructs, &MongoDBStruct{
+						Name:          f.Name,
+						BsonTag:       f.BsonTag,
+						Fields:        nestedField,
+						Fields:        nestedField,
+						NestedStructs: nestedStructs,
+					})
+			*/
 			continue
 		default:
 			parsedFields = append(parsedFields, f)

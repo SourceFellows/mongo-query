@@ -1,6 +1,9 @@
 package filter
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"strconv"
+)
 
 type ListingFilter struct {
 	ListingUrl Field
@@ -42,12 +45,24 @@ var Listing = ListingFilter{
 }
 
 var Review = ReviewFilter{
-	Id:           Field("_id"),
-	Date:         Field("date"),
-	ListingId:    Field("listing_id"),
-	ReviewerId:   Field("reviewer_id"),
-	ReviewerName: Field("reviewer_name"),
-	Comments:     Field("comments"),
+	Id:           Field("reviews._id"),
+	Date:         Field("reviews.date"),
+	ListingId:    Field("reviews.listing_id"),
+	ReviewerId:   Field("reviews.reviewer_id"),
+	ReviewerName: Field("reviews.reviewer_name"),
+	Comments:     Field("reviews.comments"),
+}
+
+func (r ReviewFilter) ElementNo(i int) ReviewFilter {
+	prefix := "reviews." + strconv.Itoa(i)
+	return ReviewFilter{
+		Id:           Field(prefix + "._id"),
+		Date:         Field(prefix + ".date"),
+		ListingId:    Field(prefix + ".listing_id"),
+		ReviewerId:   Field(prefix + ".reviewer_id"),
+		ReviewerName: Field(prefix + ".reviewer_name"),
+		Comments:     Field(prefix + ".comments"),
+	}
 }
 
 type ListingAndReview struct {
