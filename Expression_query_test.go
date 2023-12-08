@@ -32,6 +32,9 @@ import (
 	"testing"
 )
 
+const dbConnectionStringForTesting = "mongodb://mongorootuser:mongorootpw@localhost:27017"
+const sampleCollection = "listingsAndReviews"
+
 var queryTestData = []struct {
 	testName            string
 	filter              Expression
@@ -158,7 +161,7 @@ func TestField_Equals(t *testing.T) {
 			f1 := datum.filter
 
 			//when
-			ts, err := query[ListingAndReview](f1)
+			ts, err := query[ListingAndReview](sampleCollection, f1)
 			if err != nil {
 				t.Errorf("%v", err)
 			}
@@ -173,16 +176,16 @@ func TestField_Equals(t *testing.T) {
 
 }
 
-func query[T any](filter any) ([]T, error) {
+func query[T any](collectionName string, filter any) ([]T, error) {
 
 	ctx := context.Background()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://mongorootuser:mongorootpw@localhost:27017"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbConnectionStringForTesting))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer client.Disconnect(ctx)
 
-	collection := client.Database("airbnb").Collection("listingsAndReviews")
+	collection := client.Database("airbnb").Collection(collectionName)
 
 	cursor, err := collection.Find(ctx, filter)
 	if err != nil {

@@ -26,11 +26,14 @@ package filter
 
 import (
 	"context"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"testing"
 )
+
+var updateCollectionName = "clonedForUpdate"
 
 var updateTestData = []struct {
 	testName                        string
@@ -56,12 +59,20 @@ func TestUpdateExpressions(t *testing.T) {
 		t.Run(datum.testName, func(t *testing.T) {
 
 			//given
+			err := cloneCollection(updateCollectionName)
+			if err != nil {
+				t.Errorf("could not clone collection for testing %v", err)
+				return
+			}
+			defer removeCollection(updateCollectionName)
+
 			f1 := datum.filterBeforeUpdate
 
 			//when
-			ts, err := query[ListingAndReview](f1)
+			ts, err := query[ListingAndReview](updateCollectionName, f1)
 			if err != nil {
 				t.Errorf("%v", err)
+				return
 			}
 
 			if len(ts) != datum.expectedResultCountBeforeUpdate {
@@ -73,7 +84,7 @@ func TestUpdateExpressions(t *testing.T) {
 				t.Errorf("[UPDATE] error while updating %v", err)
 			}
 
-			ts, err = query[ListingAndReview](f1)
+			ts, err = query[ListingAndReview](updateCollectionName, f1)
 			if err != nil {
 				t.Errorf("%v", err)
 			}
@@ -90,13 +101,13 @@ func TestUpdateExpressions(t *testing.T) {
 func updateOne(filter any, update any) (int64, error) {
 
 	ctx := context.Background()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://mongorootuser:mongorootpw@localhost:27017"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbConnectionStringForTesting))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer client.Disconnect(ctx)
 
-	collection := client.Database("airbnb").Collection("listingsAndReviews")
+	collection := client.Database("airbnb").Collection(updateCollectionName)
 
 	result, err := collection.UpdateOne(ctx, filter, update)
 	if err != nil {
@@ -104,4 +115,33 @@ func updateOne(filter any, update any) (int64, error) {
 	}
 
 	return result.MatchedCount, nil
+}
+
+func cloneCollection(name string) error {
+	ctx := context.Background()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbConnectionStringForTesting))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Disconnect(ctx)
+
+	command := bson.A{}
+	command = append(command, bson.D{{"$match", bson.D{}}})
+	command = append(command, bson.D{{"$out", name}})
+
+	_, err = client.Database("airbnb").Collection(sampleCollection).Aggregate(ctx, command)
+	return err
+}
+
+func removeCollection(name string) error {
+	ctx := context.Background()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbConnectionStringForTesting))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Disconnect(ctx)
+
+	collection := client.Database("airbnb").Collection(name)
+	return collection.Drop(ctx)
+
 }
