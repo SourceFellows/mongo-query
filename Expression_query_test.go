@@ -146,6 +146,11 @@ var queryTestData = []struct {
 		"Specify a Query Condition on a Field Embedded in an Array of Documents",
 		Review.ElementNo(50).ReviewerName.Equals("Milo"),
 		1,
+	},
+	{
+		"Regex Syntax",
+		Review.ReviewerName.Regex("Mi.*"),
+		1555,
 	}}
 
 func TestField_Equals(t *testing.T) {

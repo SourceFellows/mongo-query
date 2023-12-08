@@ -145,3 +145,55 @@ func ExampleExpression_Or() {
 	// Output: bson.D{{"$or", []bson.D{bson.D{{"size.h", bson.D{{"$lt", 15}}}}, bson.D{{"size.uom", "in"}}}}}
 
 }
+
+func ExampleField_Regex() {
+
+	Filter := struct {
+		Status Field
+		Size   struct {
+			H   Field
+			Uom Field
+		}
+	}{
+		Status: Field("status"),
+		Size: struct {
+			H   Field
+			Uom Field
+		}{
+			Uom: Field("size.uom"),
+			H:   Field("size.h"),
+		},
+	}
+
+	f1 := Filter.Size.Uom.Regex("i.*")
+
+	fmt.Println(f1)
+	// Output: bson.D{{"size.uom", bson.D{{"$regex", "i.*"}}}}
+
+}
+
+func ExampleField_Regex_withOptions() {
+
+	Filter := struct {
+		Status Field
+		Size   struct {
+			H   Field
+			Uom Field
+		}
+	}{
+		Status: Field("status"),
+		Size: struct {
+			H   Field
+			Uom Field
+		}{
+			Uom: Field("size.uom"),
+			H:   Field("size.h"),
+		},
+	}
+
+	f1 := Filter.Size.Uom.Regex("i.*", RegexpOptionCaseInsensitivity)
+
+	fmt.Println(f1)
+	// Output: bson.D{{"size.uom", bson.D{{"$regex", "i.*"},{"$options", "i"}}}}
+
+}

@@ -30,6 +30,11 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+type RegexpOption string
+
+// RegexpOptionCaseInsensitivity case insensitivity to match upper and lower cases.
+const RegexpOptionCaseInsensitivity = RegexpOption("i")
+
 // Field represents a single field in a BSON document.
 type Field string
 
@@ -114,6 +119,16 @@ func All(val ...any) QueryOperator {
 // "size of array"
 func Size(size int) QueryOperator {
 	return QueryOperator{operator: "$size", value: size}
+}
+
+// Regex buidls a regular expression capabilities for pattern matching
+// strings in queries.
+func Regex(val string) QueryOperator {
+	return QueryOperator{operator: "$regex", value: val}
+}
+
+func regexOptionAsQueryOperator(val string) QueryOperator {
+	return QueryOperator{operator: "$options", value: val}
 }
 
 // LogicalOperator is used to represent a logical MongoDB Operator.
@@ -209,6 +224,22 @@ func (f Field) NotExists() Expression {
 	return Expression{field: f, value: NotExists()}
 }
 
+// Regex represents an element query operation which has regular expression capabilities
+// for pattern matching strings in queries.
+func (f Field) Regex(val string, opts ...RegexpOption) Expression {
+
+	if len(opts) == 0 {
+		return Expression{field: f, value: Regex(val)}
+	}
+
+	options := ""
+	for _, opt := range opts {
+		options += string(opt)
+	}
+	combinedValue := []QueryOperator{Regex(val), regexOptionAsQueryOperator(options)}
+	return Expression{field: f, value: combinedValue}
+}
+
 // ArrayContainsAll matches all documents where the given values are in the array.
 func (f ArrayField) ArrayContainsAll(val ...any) Expression {
 	return Expression{field: Field(f), value: All(val...)}
@@ -262,7 +293,10 @@ func (e Expression) String() string {
 
 func mapToString(mapdata map[string]any) string {
 	returnVal := "bson.D{"
+	seperator := ""
 	for k, v := range mapdata {
+		returnVal += seperator
+		seperator = ","
 		switch v.(type) {
 		case map[string]any:
 			returnVal += fmt.Sprintf("{\"%s\", %v}", k, mapToString(v.(map[string]any)))
