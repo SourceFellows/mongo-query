@@ -11,7 +11,7 @@ type fullUpdateOperator map[string]bson.D
 func (fuo fullUpdateOperator) bson() bson.D {
 	values := bson.D{}
 	for operator, ops := range fuo {
-		values = append(values, bson.E{operator, ops})
+		values = append(values, bson.E{Key: operator, Value: ops})
 	}
 	return values
 }
@@ -26,13 +26,13 @@ type UpdateOperator struct {
 func (uo UpdateOperator) bson() bson.D {
 	values := bson.D{}
 	for k, v := range uo.values {
-		values = append(values, bson.E{string(k), v})
+		values = append(values, bson.E{Key: string(k), Value: v})
 	}
 	return bson.D{{Key: uo.operator, Value: values}}
 }
 
 func (uo UpdateOperator) bsonWithoutOperator() bson.E {
-	return bson.E{string(uo.field), uo.value}
+	return bson.E{Key: string(uo.field), Value: uo.value}
 }
 
 func set(field Field, value any) UpdateOperator {
@@ -63,45 +63,66 @@ func unset(field Field) UpdateOperator {
 	return UpdateOperator{operator: "$unset", field: field, value: ""}
 }
 
-//func currentDate(field Field) UpdateOperator {
-//	return UpdateOperator{operator: "$currentDate", field: "lastModified", value: true}
-//}
+func currentDate(field Field) UpdateOperator {
+	return UpdateOperator{operator: "$currentDate", field: "lastModified", value: true}
+}
 
 type UpdateExpression struct {
 	value any
 }
 
+// Set replaces the value of the field with the specified value.
 func (f Field) Set(value any) UpdateExpression {
 	return UpdateExpression{value: set(f, value)}
 }
 
+// Inc increments the field by a specified value.
 func (f Field) Inc(value any) UpdateExpression {
 	return UpdateExpression{value: inc(f, value)}
 }
 
+// Min updates the value of the field to a specified value if the specified value
+// is less than the current value of the field.
+//
+// The '$min operator', which is used internally, can compare values of different
+// types, using the BSON comparison order.
 func (f Field) Min(value any) UpdateExpression {
 	return UpdateExpression{value: min(f, value)}
 }
 
+// Max updates the value of the field to a specified value if the specified value is
+// greater than the current value of the field.
+//
+// The '$max operator', which is used internally, can compare values of different
+// types, using the BSON comparison order.
 func (f Field) Max(value any) UpdateExpression {
 	return UpdateExpression{value: max(f, value)}
 }
 
+// Mul multiplies the value of the field by a number.
+//
+// The field to update must contain a numeric value.
 func (f Field) Mul(value any) UpdateExpression {
 	return UpdateExpression{value: mul(f, value)}
 }
 
-func (f Field) Rename(value string) UpdateExpression {
-	return UpdateExpression{value: rename(f, value)}
+// Rename updates the name of the field.
+//
+// The new field name must differ from the existing field name.
+func (f Field) Rename(value Field) UpdateExpression {
+	return UpdateExpression{value: rename(f, string(value))}
 }
 
+// Unset deletes the particular field.
 func (f Field) Unset() UpdateExpression {
 	return UpdateExpression{value: unset(f)}
 }
 
-//func (f Field) CurrentDate() UpdateExpression {
-//	return UpdateExpression{value: currentDate(f)}
-//}
+// CurrentDate sets the value of a field to the current date, either as a Date or
+// a timestamp.
+func (f Field) CurrentDate() UpdateExpression {
+	return UpdateExpression{value: currentDate(f)}
+}
 
 func (ue UpdateExpression) MarshalBSON() ([]byte, error) {
 	data := ue.bsonD()
