@@ -65,11 +65,11 @@ func Test_Compare_In(t *testing.T) {
 
 	//when
 	//check if api works
-	apiResult, err := query[ListingAndReview](apiFilter)
+	apiResult, err := query[ListingAndReview](sampleCollection, apiFilter)
 	if err != nil {
 		t.Errorf("could not execute query %v", err)
 	}
-	mongoResult, err := query[ListingAndReview](mongoFilter)
+	mongoResult, err := query[ListingAndReview](sampleCollection, mongoFilter)
 	if err != nil {
 		t.Errorf("could not execute query %v", err)
 	}
@@ -92,11 +92,11 @@ func Test_Compare_Gt(t *testing.T) {
 
 	//when
 	//check if api works
-	apiResult, err := query[ListingAndReview](apiFilter)
+	apiResult, err := query[ListingAndReview](sampleCollection, apiFilter)
 	if err != nil {
 		t.Errorf("could not execute query %v", err)
 	}
-	mongoResult, err := query[ListingAndReview](mongoFilter)
+	mongoResult, err := query[ListingAndReview](sampleCollection, mongoFilter)
 	if err != nil {
 		t.Errorf("could not execute query %v", err)
 	}
@@ -127,11 +127,11 @@ func Test_Compare_EqualsAndSize(t *testing.T) {
 	}}}
 
 	//when
-	apiResult, err := query[ListingAndReview](apiFilter)
+	apiResult, err := query[ListingAndReview](sampleCollection, apiFilter)
 	if err != nil {
 		t.Errorf("could not execute query %v", err)
 	}
-	mongoResult, err := query[ListingAndReview](mongoFilter)
+	mongoResult, err := query[ListingAndReview](sampleCollection, mongoFilter)
 	if err != nil {
 		t.Errorf("could not execute query %v", err)
 	}
@@ -156,11 +156,11 @@ func Test_Compare_ArrayContainsQueryOperator(t *testing.T) {
 	}}}
 
 	//when
-	apiResult, err := query[ListingAndReview](apiFilter)
+	apiResult, err := query[ListingAndReview](sampleCollection, apiFilter)
 	if err != nil {
 		t.Errorf("could not execute query %v", err)
 	}
-	mongoResult, err := query[ListingAndReview](mongoFilter)
+	mongoResult, err := query[ListingAndReview](sampleCollection, mongoFilter)
 	if err != nil {
 		t.Errorf("could not execute query %v", err)
 	}
@@ -186,11 +186,11 @@ func Test_Compare_ArrayContainsQueryOperatorWithAndCondition(t *testing.T) {
 	}}}
 
 	//when
-	apiResult, err := query[ListingAndReview](apiFilter)
+	apiResult, err := query[ListingAndReview](sampleCollection, apiFilter)
 	if err != nil {
 		t.Errorf("could not execute query %v", err)
 	}
-	mongoResult, err := query[ListingAndReview](mongoFilter)
+	mongoResult, err := query[ListingAndReview](sampleCollection, mongoFilter)
 	if err != nil {
 		t.Errorf("could not execute query %v", err)
 	}

@@ -42,17 +42,12 @@ func (fuo fullUpdateOperator) bson() bson.D {
 
 type UpdateOperator struct {
 	operator string
-	values   map[Field]any
 	field    Field
 	value    any
 }
 
 func (uo UpdateOperator) bson() bson.D {
-	values := bson.D{}
-	for k, v := range uo.values {
-		values = append(values, bson.E{Key: string(k), Value: v})
-	}
-	return bson.D{{Key: uo.operator, Value: values}}
+	return bson.D{{Key: uo.operator, Value: bson.D{{string(uo.field), uo.value}}}}
 }
 
 func (uo UpdateOperator) bsonWithoutOperator() bson.E {

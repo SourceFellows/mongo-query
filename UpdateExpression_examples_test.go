@@ -36,3 +36,12 @@ func ExampleUpdateExpression_String() {
 	// Output: bson.D{{"$set", bson.D{{"listing_url", "http://www.source-fellows.com"}}}}
 
 }
+
+func ExampleUpdateExpression_String_andCondition() {
+
+	expression := Listing.ListingUrl.Set("http://www.source-fellows.com").And(Listing.Name.Set("Horst"))
+
+	fmt.Println(expression)
+	// Output: bson.D{{"$set", bson.D{{"listing_url", "http://www.source-fellows.com"}{"name", "Horst"}}}}
+
+}
