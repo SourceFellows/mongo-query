@@ -31,6 +31,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"testing"
+	"time"
 )
 
 var updateCollectionName = "clonedForUpdate"
@@ -57,6 +58,13 @@ var updateTestData = []struct {
 		Listing.ListingUrl.Set("http://www.source-fellows.com").And(Listing.Name.Set("Horst")),
 		1,
 	},
+	{"currentDate",
+		Listing.LastScraped.Gt(time.Now().Add(time.Second * -2)),
+		0,
+		Listing.ListingUrl.Equals("https://www.airbnb.com/rooms/10009999"),
+		Listing.LastScraped.CurrentDate(),
+		1,
+	},
 }
 
 func TestUpdateExpressions(t *testing.T) {
@@ -71,7 +79,6 @@ func TestUpdateExpressions(t *testing.T) {
 				t.Errorf("could not clone collection for testing %v", err)
 				return
 			}
-			defer removeCollection(updateCollectionName)
 
 			f1 := datum.filterBeforeUpdate
 
@@ -138,17 +145,4 @@ func cloneCollection(name string) error {
 
 	_, err = client.Database("airbnb").Collection(sampleCollection).Aggregate(ctx, command)
 	return err
-}
-
-func removeCollection(name string) error {
-	ctx := context.Background()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbConnectionStringForTesting))
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer client.Disconnect(ctx)
-
-	collection := client.Database("airbnb").Collection(name)
-	return collection.Drop(ctx)
-
 }

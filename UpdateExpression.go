@@ -83,7 +83,7 @@ func unset(field Field) UpdateOperator {
 }
 
 func currentDate(field Field) UpdateOperator {
-	return UpdateOperator{operator: "$currentDate", field: "lastModified", value: true}
+	return UpdateOperator{operator: "$currentDate", field: field, value: true}
 }
 
 type UpdateExpression struct {
