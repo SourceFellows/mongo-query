@@ -30,12 +30,13 @@ import (
 )
 
 type ListingFilter struct {
-	ListingUrl Field
-	Name       Field
-	Bedrooms   Field
-	Amenities  ArrayField
-	Images     ImagesFilter
-	Reviews    ArrayField
+	ListingUrl  Field
+	Name        Field
+	Bedrooms    Field
+	Amenities   ArrayField
+	Images      ImagesFilter
+	Reviews     ArrayField
+	LastScraped Field
 }
 
 type ReviewFilter struct {
@@ -65,7 +66,8 @@ var Listing = ListingFilter{
 		PictureUrl:   Field("images.picture_url"),
 		XlPictureUrl: Field("images.xl_picture_url"),
 	},
-	Reviews: ArrayField("reviews"),
+	Reviews:     ArrayField("reviews"),
+	LastScraped: Field("last_scraped"),
 }
 
 var Review = ReviewFilter{
