@@ -196,3 +196,13 @@ func (ue UpdateExpression) bsonD() bson.D {
 	log.Println(returnValue)
 	return returnValue
 }
+
+func (e UpdateExpression) String() string {
+
+	data := e.bsonD()
+	bytes, _ := bson.Marshal(data)
+	mapdata := make(map[string]any)
+	_ = bson.Unmarshal(bytes, &mapdata)
+
+	return mapToString(mapdata)
+}
