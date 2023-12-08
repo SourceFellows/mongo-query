@@ -28,7 +28,7 @@ import (
 	"fmt"
 )
 
-func ExampleUpdateExpression_String() {
+func ExampleField_Set() {
 
 	expression := Listing.ListingUrl.Set("http://www.source-fellows.com")
 
@@ -37,7 +37,7 @@ func ExampleUpdateExpression_String() {
 
 }
 
-func ExampleUpdateExpression_String_andCondition() {
+func ExampleField_Set_withCondition() {
 
 	expression := Listing.ListingUrl.Set("http://www.source-fellows.com").And(Listing.Name.Set("Horst"))
 
