@@ -28,7 +28,7 @@ import (
 	"fmt"
 )
 
-func ExampleExpression_String_simpleEquals() {
+func ExampleField_Equals() {
 
 	Filter := struct {
 		Size struct {
@@ -48,7 +48,7 @@ func ExampleExpression_String_simpleEquals() {
 	// Output: bson.D{{"size.uom", "in"}}
 }
 
-func ExampleExpression_String_simpleLowerThan() {
+func ExampleField_Lt() {
 
 	Filter := struct {
 		Size struct {
@@ -68,7 +68,7 @@ func ExampleExpression_String_simpleLowerThan() {
 	// Output: bson.D{{"size.h", bson.D{{"$lt", 15}}}}
 }
 
-func ExampleExpression_String_simpleAnd() {
+func ExampleExpression_And() {
 
 	Filter := struct {
 		Status Field
@@ -94,7 +94,7 @@ func ExampleExpression_String_simpleAnd() {
 
 }
 
-func ExampleExpression_String_simpleAndWithThreeParts() {
+func ExampleExpression_And_withEquals() {
 
 	Filter := struct {
 		Status Field
@@ -120,7 +120,7 @@ func ExampleExpression_String_simpleAndWithThreeParts() {
 
 }
 
-func ExampleExpression_String_simpleOr() {
+func ExampleExpression_Or() {
 
 	Filter := struct {
 		Status Field
