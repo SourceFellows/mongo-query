@@ -32,7 +32,7 @@ import (
 	"testing"
 )
 
-var testData = []struct {
+var queryTestData = []struct {
 	testName            string
 	filter              Expression
 	expectedResultCount int
@@ -150,7 +150,7 @@ var testData = []struct {
 
 func TestField_Equals(t *testing.T) {
 
-	for _, datum := range testData {
+	for _, datum := range queryTestData {
 
 		t.Run(datum.testName, func(t *testing.T) {
 
