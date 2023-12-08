@@ -50,6 +50,13 @@ var updateTestData = []struct {
 		Listing.ListingUrl.Set("http://www.source-fellows.com"),
 		1,
 	},
+	{"simple updateOne with and condition",
+		Listing.ListingUrl.Equals("http://www.source-fellows.com").And(Listing.Name.Equals("Horst")),
+		0,
+		Listing.ListingUrl.Equals("https://www.airbnb.com/rooms/10009999"),
+		Listing.ListingUrl.Set("http://www.source-fellows.com").And(Listing.Name.Set("Horst")),
+		1,
+	},
 }
 
 func TestUpdateExpressions(t *testing.T) {
