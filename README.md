@@ -6,11 +6,11 @@
 
 ----
 
-**mongo Query is a Library which makes building MongoDB Queries easy in Golang**
+**mongo Query is a library that makes it easy to build MongoDB queries in Golang**
 
-Formulating requests with the MongoDB API is sometimes very difficult and error-prone. You have to build and nest untyped objects. This will quickly become confusing and therefore difficult to read and maintain. mongo Query solves this problem with an easier to understand (DSL like) API.
+Formulating requests with the MongoDB API is sometimes very difficult and error-prone. You have to build and nest untyped objects (`bson.M, bson.D, ...`). This will quickly become confusing and therefore difficult to read and maintain. mongo Query solves this problem with an easier to understand (DSL like) API.
 
-The following expression will find all documents where the array of 'amenities' has a size of 15 and the 'ListingUrl' equals '<value>' and the 'pictureUrl' of the 'image' equals '<value>':
+For example, the following 'mongo Query' expression finds all documents in a MongoDB database where the array of 'amenities' has a size of 15 and the 'ListingUrl' equals '<value>' and the 'pictureUrl' of the 'image' equals '<value>':
 
 ```Golang
 Listing.Amenities.ArraySize(15).
@@ -18,9 +18,9 @@ Listing.Amenities.ArraySize(15).
       Listing.Images.PictureUrl.Equals("<value>"))
 ```
 
-The queries are build with Filter structs which can be generated with a commandline tool which is also part of this project (see [Generating filter types](#generating-filter-types)).
+> The (DSL-) queries are created with 'Filter structs' which can be generated using a commandline tool, which is also part of this project (see [Generating filter types](#generating-filter-types)).
 
-The [API documentation can be found here](https://pkg.go.dev/github.com/sourcefellows/mongo-query#section-documentation)
+The [API documentation for the filter structs can be found here](https://pkg.go.dev/github.com/sourcefellows/mongo-query#section-documentation). It is based on the 'native MongoDB query API'.
 
 ## MongoDB API vs mongo Query
 
@@ -76,10 +76,11 @@ It is:
 * expressive
 * easy to write
 * independent of the `bson.D` structure
+* resistant to renaming BSON field names
 
 ## How to use mongo Query
 
-mongo Query uses its own simple API with `Expression`s, `Field`s and `Operator`s.
+mongo Query uses its own simple API with `Expression`, `Field` and `Operator` types.
 
 You can simply define a filter type for each struct you want to query. Instances of this filter types can than be used as parameter to the MongoDB API. They will automatically be marshalled as MongoDB `bson.D` objects. 
 
@@ -193,3 +194,4 @@ err = findWithFilter(ctx, collection,
         And(InventoryFilter.Size.Uom.Equals("in"),
             InventoryFilter.Status.Equals("D")))
 ```
+* More samples can be found in the [unit tests of the project](./Expression_query_test.go).
