@@ -4,7 +4,7 @@
 package filter
 
 import (
-	mq "github.com/sourcefellows/mongo-query"
+	mq "github.com/sourcefellows/mongo-query/v2"
 	"strconv"
 )
 

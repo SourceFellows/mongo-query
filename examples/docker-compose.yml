@@ -1,7 +1,7 @@
 version: '3'
 services:
   mongodb:
-    image: mongo
+    image: mongo:8
     environment:
       - MONGO_INITDB_DATABASE=mongodb
       - MONGO_INITDB_ROOT_USERNAME=mongorootuser
@@ -12,7 +12,7 @@ services:
       - ./import-sample-data.sh:/docker-entrypoint-initdb.d/import-sample-data.sh:ro
       - ./listingsAndReviews.json:/listingsAndReviews.json:ro
   mongo-express:
-    image: mongo-express
+    image: mongo-express:1.0.2
     depends_on:
       - mongodb
     environment:

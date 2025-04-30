@@ -26,9 +26,9 @@ package filter
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 	"log"
 	"testing"
 	"time"
@@ -115,7 +115,7 @@ func TestUpdateExpressions(t *testing.T) {
 func updateOne(filter any, update any) (int64, error) {
 
 	ctx := context.Background()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbConnectionStringForTesting))
+	client, err := mongo.Connect(options.Client().ApplyURI(dbConnectionStringForTesting))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -133,7 +133,7 @@ func updateOne(filter any, update any) (int64, error) {
 
 func cloneCollection(name string) error {
 	ctx := context.Background()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbConnectionStringForTesting))
+	client, err := mongo.Connect(options.Client().ApplyURI(dbConnectionStringForTesting))
 	if err != nil {
 		log.Fatal(err)
 	}

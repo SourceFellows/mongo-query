@@ -3,7 +3,7 @@
 Install the cmd tool and run it:
 
 ```bash
-go install github.com/sourcefellows/mongo-query/cmd/mongo-query-gen@latest
+go install github.com/sourcefellows/mongo-query/v2/cmd/mongo-query-gen@latest
 ```
 
 Run it either by ruinning on command line...

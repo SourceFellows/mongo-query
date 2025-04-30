@@ -26,8 +26,8 @@ package filter
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 	"log"
 	"testing"
 )
@@ -154,7 +154,13 @@ var queryTestData = []struct {
 		"Regex Syntax",
 		Review.ReviewerName.Regex("Mi.*"),
 		1555,
-	}}
+	},
+	{
+		"",
+		Listing.Bedrooms.Lt(2).And(Listing.Accommodates.Equals(1)),
+		547,
+	},
+}
 
 func TestField_Equals(t *testing.T) {
 
@@ -184,7 +190,7 @@ func TestField_Equals(t *testing.T) {
 func query[T any](collectionName string, filter any) ([]T, error) {
 
 	ctx := context.Background()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbConnectionStringForTesting))
+	client, err := mongo.Connect(options.Client().ApplyURI(dbConnectionStringForTesting))
 	if err != nil {
 		log.Fatal(err)
 	}

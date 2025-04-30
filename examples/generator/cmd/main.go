@@ -26,7 +26,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/sourcefellows/mongo-query/examples/generator/filter"
+	"github.com/sourcefellows/mongo-query/v2/examples/generator/filter"
 )
 
 func main() {

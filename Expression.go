@@ -26,8 +26,7 @@ package filter
 
 import (
 	"fmt"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 type RegexpOption string
@@ -318,11 +317,10 @@ func mapToString(mapdata map[string]any) string {
 	for k, v := range mapdata {
 		returnVal += seperator
 		seperator = ","
-		switch v.(type) {
+		switch value := v.(type) {
 		case map[string]any:
 			returnVal += fmt.Sprintf("{\"%s\", %v}", k, mapToString(v.(map[string]any)))
-		case primitive.A:
-			value := v.(primitive.A)
+		case bson.A:
 			returnVal += fmt.Sprintf("{\"%s\", ", k)
 			separator := ""
 			returnVal += "[]bson.D{"
@@ -332,19 +330,37 @@ func mapToString(mapdata map[string]any) string {
 				if v1, ok := v.(map[string]any); ok {
 					returnVal += fmt.Sprintf("%s", mapToString(v1))
 				} else {
-					returnVal += fmt.Sprintf("{\"%s\", %v}", k, v)
+					returnVal += mapValToString(v)
 				}
 			}
 			returnVal += "}}"
 		case int, int32, int64, float32, float64:
 			returnVal += fmt.Sprintf("{\"%s\", %v}", k, v)
 		default:
-			returnVal += fmt.Sprintf("{\"%s\", \"%v\"}", k, v)
+			returnVal += fmt.Sprintf("{\"%s\", %v}", k, mapValToString(v))
 		}
 	}
 	returnVal += "}"
 
 	return returnVal
+}
+
+func mapValToString(mapdata any) string {
+	switch v := mapdata.(type) {
+	case bson.D:
+		separator := ""
+		str := "bson.D{"
+		for _, val := range v {
+			str += separator
+			str += fmt.Sprintf("{\"%s\", %v}", val.Key, mapValToString(val.Value))
+			separator = ","
+		}
+		return str + "}"
+	case int, int32, int64, float32, float64:
+		return fmt.Sprintf("%v", mapdata)
+	default:
+		return fmt.Sprintf("\"%v\"", mapdata)
+	}
 }
 
 // MarshalBSON serializes the Expression to BSON data.
@@ -388,12 +404,12 @@ func expressionsToBSON(expressions []Expression) []bson.D {
 		switch expression.value.(type) {
 		case QueryOperator:
 			qo := expression.value.(QueryOperator)
-			d = bson.D{primitive.E{Key: string(expression.field), Value: bson.D{{Key: qo.operator, Value: qo.value}}}}
+			d = bson.D{bson.E{Key: string(expression.field), Value: bson.D{{Key: qo.operator, Value: qo.value}}}}
 		case []QueryOperator:
 			qo := expression.value.([]QueryOperator)
-			d = bson.D{primitive.E{Key: string(expression.field), Value: queryOperatorsToBSON(qo)}}
+			d = bson.D{bson.E{Key: string(expression.field), Value: queryOperatorsToBSON(qo)}}
 		default:
-			d = bson.D{primitive.E{Key: string(expression.field), Value: expression.value}}
+			d = bson.D{bson.E{Key: string(expression.field), Value: expression.value}}
 		}
 		values = append(values, d)
 	}

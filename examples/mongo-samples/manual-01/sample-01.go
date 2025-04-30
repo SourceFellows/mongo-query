@@ -26,10 +26,10 @@ package main
 
 import (
 	"context"
-	mq "github.com/sourcefellows/mongo-query"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	mq "github.com/sourcefellows/mongo-query/v2"
+	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 	"log"
 )
 

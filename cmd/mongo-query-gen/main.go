@@ -27,7 +27,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/sourcefellows/mongo-query/internal"
+	"github.com/sourcefellows/mongo-query/v2/internal"
 	"log"
 	"os"
 )

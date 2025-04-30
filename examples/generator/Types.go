@@ -24,43 +24,43 @@
 
 package generator
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import primitive "go.mongodb.org/mongo-driver/v2/bson"
 
 //go:generate mongo-query-gen -in Types.go -outDir .
 
 type ListingAndReview struct {
-	Id                   string               `bson:"_id"`
-	ListingUrl           string               `bson:"listing_url"`
-	Name                 string               `bson:"name"`
-	Summary              string               `bson:"summary"`
-	Space                string               `bson:"space"`
-	Description          string               `bson:"description"`
-	NeighborhoodOverview string               `bson:"neighborhood_overview"`
-	Notes                string               `bson:"notes"`
-	Transit              string               `bson:"transit"`
-	Access               string               `bson:"access"`
-	Interaction          string               `bson:"interaction"`
-	HouseRules           string               `bson:"house_rules"`
-	PropertyType         string               `bson:"property_type"`
-	RoomType             string               `bson:"room_type"`
-	BedType              string               `bson:"bed_type"`
-	MinimumNights        string               `bson:"minimum_nights"`
-	MaximumNights        string               `bson:"maximum_nights"`
-	CancellationPolicy   string               `bson:"cancellation_policy"`
-	LastScraped          primitive.DateTime   `bson:"last_scraped"`
-	CalendarLastScraped  primitive.DateTime   `bson:"calendar_last_scraped"`
-	Accommodates         int                  `bson:"accommodates"`
-	Bedrooms             int                  `bson:"bedrooms"`
-	Beds                 int                  `bson:"beds"`
-	NumberOfReviews      int                  `bson:"number_of_reviews"`
-	Bathrooms            primitive.Decimal128 `bson:"bathrooms"`
-	Amenities            []string             `bson:"amenities"`
-	Price                primitive.Decimal128 `bson:"price"`
-	WeeklyPrice          primitive.Decimal128 `bson:"weekly_price"`
-	MonthlyPrice         primitive.Decimal128 `bson:"monthly_price"`
-	CleaningFee          primitive.Decimal128 `bson:"cleaning_fee"`
-	ExtraPeople          primitive.Decimal128 `bson:"extra_people"`
-	GuestsIncluded       primitive.Decimal128 `bson:"guests_included"`
+	Id                   string          `bson:"_id"`
+	ListingUrl           string          `bson:"listing_url"`
+	Name                 string          `bson:"name"`
+	Summary              string          `bson:"summary"`
+	Space                string          `bson:"space"`
+	Description          string          `bson:"description"`
+	NeighborhoodOverview string          `bson:"neighborhood_overview"`
+	Notes                string          `bson:"notes"`
+	Transit              string          `bson:"transit"`
+	Access               string          `bson:"access"`
+	Interaction          string          `bson:"interaction"`
+	HouseRules           string          `bson:"house_rules"`
+	PropertyType         string          `bson:"property_type"`
+	RoomType             string          `bson:"room_type"`
+	BedType              string          `bson:"bed_type"`
+	MinimumNights        string          `bson:"minimum_nights"`
+	MaximumNights        string          `bson:"maximum_nights"`
+	CancellationPolicy   string          `bson:"cancellation_policy"`
+	LastScraped          bson.DateTime   `bson:"last_scraped"`
+	CalendarLastScraped  bson.DateTime   `bson:"calendar_last_scraped"`
+	Accommodates         int             `bson:"accommodates"`
+	Bedrooms             int             `bson:"bedrooms"`
+	Beds                 int             `bson:"beds"`
+	NumberOfReviews      int             `bson:"number_of_reviews"`
+	Bathrooms            bson.Decimal128 `bson:"bathrooms"`
+	Amenities            []string        `bson:"amenities"`
+	Price                bson.Decimal128 `bson:"price"`
+	WeeklyPrice          bson.Decimal128 `bson:"weekly_price"`
+	MonthlyPrice         bson.Decimal128 `bson:"monthly_price"`
+	CleaningFee          bson.Decimal128 `bson:"cleaning_fee"`
+	ExtraPeople          bson.Decimal128 `bson:"extra_people"`
+	GuestsIncluded       bson.Decimal128 `bson:"guests_included"`
 	Images               struct {
 		ThumbnailUrl string `bson:"thumbnail_url"`
 		MediumUrl    string `bson:"medium_url"`
@@ -112,11 +112,11 @@ type ListingAndReview struct {
 		ReviewScoresRating        int `bson:"review_scores_rating"`
 	} `bson:"review_scores"`
 	Reviews []struct {
-		Id           string             `bson:"_id"`
-		Date         primitive.DateTime `bson:"date"`
-		ListingId    string             `bson:"listing_id"`
-		ReviewerId   string             `bson:"reviewer_id"`
-		ReviewerName string             `bson:"reviewer_name"`
-		Comments     string             `bson:"comments"`
+		Id           string        `bson:"_id"`
+		Date         bson.DateTime `bson:"date"`
+		ListingId    string        `bson:"listing_id"`
+		ReviewerId   string        `bson:"reviewer_id"`
+		ReviewerName string        `bson:"reviewer_name"`
+		Comments     string        `bson:"comments"`
 	} `bson:"reviews"`
 }

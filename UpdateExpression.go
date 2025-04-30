@@ -27,7 +27,7 @@ package filter
 import (
 	"log"
 
-	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 type fullUpdateOperator map[string]bson.D

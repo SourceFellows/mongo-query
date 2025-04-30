@@ -30,7 +30,7 @@ The following example shows how the queries differ between the MongoDB API and m
 type ListingAndReview struct {
 	ListingUrl           string               `bson:"listing_url"`
 	Name                 string               `bson:"name"`
-	Bathrooms            primitive.Decimal128 `bson:"bathrooms"`
+	Bathrooms            bson.Decimal128 `bson:"bathrooms"`
 	Amenities            []string             `bson:"amenities"`
 	Images               struct {
 		ThumbnailUrl string `bson:"thumbnail_url"`
@@ -82,9 +82,9 @@ It is:
 
 mongo Query uses its own simple API with `Expression`, `Field` and `Operator` types.
 
-You can simply define a filter type for each struct you want to query. Instances of this filter types can than be used as parameter to the MongoDB API. They will automatically be marshalled as MongoDB `bson.D` objects. 
+You can define a filter type for each struct you want to query. Instances of these filter types can then be used as parameters for the MongoDB API and will be automatically marshaled into MongoDB `bson.D` objects.
 
-> **You can generate this filter types with a generator which is also part of this project**! [See below](#generating-filter-types).
+> **You can generate these filter types with a generator which is also part of this project**! [See below](#generating-filter-types).
 
 ```Golang
 type ListingFilter struct {
@@ -146,7 +146,7 @@ cursor, err := collection.Find(ctx, filter)
 Defining filter types is easy. Just use the generator which is also included in the project. Install it via `go install` and use it (see an [example here](./examples/generator)):
 
 ```bash
-go install github.com/sourcefellows/mongo-query/cmd/mongo-query-gen@latest
+go install github.com/sourcefellows/mongo-query/v2/cmd/mongo-query-gen@latest
 ```
 
 ```bash

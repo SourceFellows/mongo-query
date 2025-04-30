@@ -26,7 +26,7 @@ package internal
 
 import (
 	"bytes"
-	"github.com/sourcefellows/mongo-query/internal/templates"
+	"github.com/sourcefellows/mongo-query/v2/internal/templates"
 	"go/format"
 	"html/template"
 	"io"
